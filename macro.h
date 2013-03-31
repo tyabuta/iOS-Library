@@ -1,5 +1,5 @@
 /*******************************************************************************
-  macro.h 1.2.0.3 (2013/03/30)
+  macro.h 1.3.0.4
 
                               マクロ関数用のヘッダ
  
@@ -662,6 +662,62 @@ static inline void tweetComposeShow(NSString* initialTweet, UIImage* image, UIVi
 
 #endif // SOCIAL_CLASS_AVAILABLE
 
+
+
+
+/*
+ * #import <MediaPlayer/MediaPlayer.h>
+ * MediaPlayer.frameworkが必要
+ */
+#ifdef MP_EXTERN_CLASS_AVAILABLE
+
+/*
+ * 音量を設定する。0-1
+ */
+static inline void systemVolumeSet(float volume){
+    MPMusicPlayerController* musicPlayer = [MPMusicPlayerController applicationMusicPlayer];
+    musicPlayer.volume = volume;
+}
+
+/*
+ * 今の音量から増減量を指定する。0-1
+ */
+static inline void systemVolumeAdditional(float addVolume){
+    MPMusicPlayerController* musicPlayer = [MPMusicPlayerController applicationMusicPlayer];
+    musicPlayer.volume += addVolume;
+}
+
+/*
+ * 今の音量を取得する。0-1
+ */
+static inline float systemVolumeGet(float volume){
+    MPMusicPlayerController* musicPlayer = [MPMusicPlayerController applicationMusicPlayer];
+    return musicPlayer.volume = volume;
+}
+
+/*
+ * システムボリュームの丁度一目盛り分の値を取得する。
+ */
+static inline float systemVolumeOne(){
+    return 0.0625f;
+}
+#endif // MP_EXTERN_CLASS_AVAILABLE
+
+
+/*
+ * #import <QuartzCore/QuartzCore.h>
+ */
+#ifdef QUARTZCORE_H
+
+/*
+ * ビューのコーナに丸くマスクをかける。
+ */
+static inline void viewSetCornerRadiusAndMask(UIView* view){
+    view.layer.cornerRadius = 5.0f;
+    view.layer.masksToBounds = YES;
+}
+
+#endif // QUARTZCORE_H
 
 
 
