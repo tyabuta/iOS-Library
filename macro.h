@@ -1,5 +1,5 @@
 /*******************************************************************************
-  macro.h 1.3.0.4
+  macro.h 1.4.0.5
 
                               マクロ関数用のヘッダ
  
@@ -603,6 +603,17 @@ static inline BOOL orientationPermitForUpAndDownside(UIInterfaceOrientation inte
     return NO;
 }
 
+
+
+/*
+ * UIViewControllerの親子関係を作る。
+ */
+static inline void
+addChildViewController(UIViewController* child, UIViewController* toParent){
+    [toParent addChildViewController:child];
+    [toParent.view addSubview:child.view];
+    [child didMoveToParentViewController:toParent];
+}
 
 
 /*
