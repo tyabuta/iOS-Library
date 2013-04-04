@@ -1,5 +1,5 @@
 /*******************************************************************************
-  macro.h 1.4.1.6
+  macro.h 1.4.1.7
 
                               マクロ関数用のヘッダ
  
@@ -281,7 +281,34 @@ static inline NSString* dumpAppDefaults(){
 }
 
 
+/*
+ * UUID文字列を生成する
+ */
+static inline NSString* UUIDGenerate(){
+    CFUUIDRef   uuidRef = CFUUIDCreate(kCFAllocatorDefault);
+    CFStringRef uuidStr = CFUUIDCreateString(kCFAllocatorDefault, uuidRef);
+    CFRelease(uuidRef);
+    
+    NSString* fileName = [NSString stringWithString:(__bridge NSString*)uuidStr];
+    CFRelease(uuidStr);
+    return fileName;
+}
 
+/*
+ * URLエンコードする
+ */
+static inline NSString* urlEncode(NSString* str){
+    CFStringRef encodedString =
+    CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
+                                            (CFStringRef)str,
+                                            NULL,
+                                            CFSTR(";,/?:@&=+$#"),
+                                            kCFStringEncodingUTF8);
+    
+    NSString* nsString = [NSString stringWithString:(__bridge NSString*)encodedString];
+    CFRelease(encodedString);
+    return nsString;
+}
 
 
 /*
@@ -677,6 +704,34 @@ static inline UIImage* imagePickerGetPickedImageAndHide(UIImagePickerController*
 static inline void imagePickerHide(UIImagePickerController* picker){
     [picker dismissViewControllerAnimated:YES completion:NULL];
 }
+
+
+
+
+
+/*
+ * 角丸四角形を描画する
+ */
+static inline void
+drawRoundRect(CGContextRef context, CGRect rect, CGFloat radius, CGColorRef color){
+    
+    CGContextSetFillColorWithColor(context, color);
+    
+    float left  = rect.origin.x;
+    float top   = rect.origin.y;
+    float right = left + rect.size.width;
+    float bottom= top  + rect.size.height;
+    
+    CGContextMoveToPoint(context, left, top + (rect.size.height/2));
+    CGContextAddArcToPoint(context,  left,    top, right,    top, radius);
+    CGContextAddArcToPoint(context, right,    top, right, bottom, radius);
+    CGContextAddArcToPoint(context, right, bottom,  left, bottom, radius);
+    CGContextAddArcToPoint(context,  left, bottom,  left,    top, radius);
+    CGContextClosePath(context);
+    CGContextFillPath(context);
+}
+
+
 
 
 /*
