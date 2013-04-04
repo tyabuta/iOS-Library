@@ -1,5 +1,5 @@
 /*******************************************************************************
-  macro.h 1.4.0.5
+  macro.h 1.4.1.6
 
                               マクロ関数用のヘッダ
  
@@ -409,11 +409,36 @@ static UIImageView* imageAddBasicFromPath(NSString* imagePath, UIView* parentVie
  * デリゲート例)
  * - (void)buttonTaped:(UIButton*)sender
  */
-static UIButton* buttonAddBasic(NSString* title, CGRect frame, UIView* parentView, id target, SEL action){
+static inline UIButton*
+buttonAddBasic(NSString* title, CGRect frame, UIView* parentView, id target, SEL action){
     UIButton* button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [button setTitle:title forState:UIControlStateNormal];
     button.frame = frame;
     [button addTarget:target action:action forControlEvents:UIControlEventTouchUpInside];
+    [parentView addSubview:button];
+    return button;
+}
+
+
+/*
+ * リソース画像からCustomButtonをparentViewに追加する。
+ */
+static inline UIButton*
+buttonAddCustum(NSString* imageNameForNormal, NSString* imageNameForHighlighted,
+                CGRect frame, UIView* parentView, id target, SEL action){
+    
+    UIButton* button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = frame;
+    
+    [button setImage:[UIImage imageNamed:imageNameForNormal]
+            forState:UIControlStateNormal];
+    [button setImage:[UIImage imageNamed:imageNameForHighlighted]
+            forState:UIControlStateHighlighted];
+    
+    [button addTarget:target
+               action:action
+     forControlEvents:UIControlEventTouchUpInside];
+    
     [parentView addSubview:button];
     return button;
 }
