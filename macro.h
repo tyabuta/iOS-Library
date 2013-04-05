@@ -1,5 +1,5 @@
 /*******************************************************************************
-  macro.h 1.4.1.7
+  macro.h 1.5.0.8
 
                               マクロ関数用のヘッダ
  
@@ -29,9 +29,6 @@
  */
 #import <sys/time.h>
 
-
-
-
 /*
  * デバックログ用のマクロ、リリース時は何もおこらないようになる。
  * Tips: __VA_ARGS__ の前に##を付けると、引数ゼロでもコンパイルが通る。
@@ -44,82 +41,12 @@
 
 
 
-/*
- * class_getName関数を使用して、クラス名を取得する。
- */
-static inline NSString* getClassName(id object){
-    return [NSString stringWithUTF8String: class_getName([object class])];
-}
 
 
-
-/*
- * CGSize構造体用の文字列を生成する。
- */
-static inline NSString* CGSizeToString(CGSize size){
-    return [NSString stringWithFormat: @"%fx%f", size.width, size.height ];
-}
-
-/*
- * CGPoint構造体用の文字列を生成する。
- */
-static inline NSString* CGPointToString(CGPoint point){
-    return [NSString stringWithFormat: @"%f,%f", point.x, point.y];
-}
-
-/*
- * CGRect構造体用の文字列を生成する。
- */
-static inline NSString* CGRectToString(CGRect rect){
-    return [NSString stringWithFormat: @"%f,%f %fx%f",
-            rect.origin.x, rect.origin.y, rect.size.width, rect.size.height];
-}
-
-
-/*
- * dumpSubView関数内部で呼ばれる内部関数
- */
-static NSString* _dumpSubview(UIView* view, int indent){
-    
-    NSString* strIndent = @"";
-    for (int i=0; i<indent; i++){
-        if (i==indent-1) {
-            strIndent = [strIndent stringByAppendingString:@"+---"];
-        }
-        else {
-            strIndent = [strIndent stringByAppendingString:@"|   "];
-        }
-    }
-    
-    NSString* str = [NSString stringWithFormat:@"%@%s\n",
-                     strIndent,
-                     class_getName([view class])];
-    
-    for (UIView* subView in view.subviews){
-        NSString* ret = _dumpSubview(subView, indent+1);
-        str = [str stringByAppendingString:ret];
-    }
-    return str;
-}
-
-
-/*
- * UIViewのSubViewを階層表示した文字列を返す。
- */
-static inline NSString* dumpSubview(UIView* view){
-    return _dumpSubview(view, 0);
-}
-
-
-/*
- * 現在の時間[sec]をmicrosecondの精度で取得する。
- */
-static inline double gettime(){
-    struct timeval t;
-    gettimeofday(&t, NULL);
-    return t.tv_sec + (t.tv_usec * 1e-6);
-}
-
+/*------------------------------------------------------------------------------
+                           Application functions
+ -----------------------------------------------------------------------------*/
+#pragma mark Application functions
 
 /*
  * アプリケーション名を取得する。
@@ -128,80 +55,21 @@ static inline NSString* getAppName(){
     return [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
 }
 
-
-
 /*
- * モジュールディレクトリを取得する。
+ * UserDefaultsの全ての値を取得する。
  */
-static inline NSString* getModulePath(){
-    return [[NSBundle mainBundle] resourcePath];
+static inline NSString* dumpAllDefaults(){
+    NSDictionary* dic = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
+    return [NSString stringWithFormat:@"defualts:%@", dic];
 }
 
 /*
- * PATHをスラッシュでつなげる。
+ * UserDefaultsのアプリケーション固有の値を取得する。
  */
-static inline NSString* joinPath(NSString* dir, NSString* file){
-    return [NSString stringWithFormat:@"%@/%@", dir, file];
-}
-
-/*
- * PATHからファイル名のみ取り出す。
- */
-static inline NSString* getFileNameFromPath(NSString* path){
-    return [path lastPathComponent];
-}
-
-/*
- * UIRecogenizerのタッチイベントから、座標を取得する。
- * view: 基準座標となるビュー
- */
-static inline CGPoint getTouchPoint(NSSet* touches, UIView* view){
-    UITouch* touch = [touches anyObject];
-    return [touch locationInView:view];
-}
-
-/*
- * 半透明の黒色
- */
-static inline UIColor* clearBlack(){
-    return [UIColor colorWithWhite:0.0f alpha:0.5f];
-}
-
-/*
- * 半透明の白色
- */
-static inline UIColor* clearWhite(){
-    return [UIColor colorWithWhite:1.0f alpha:0.3f];
-}
-
-/*
- * 日付をYYYYMMDD形式の文字列に変換する。
- */
-static inline NSString* dateFormatToYYYYMMDD(NSDate* date){
-    NSDateFormatter* formatter = [[NSDateFormatter alloc] init];
-    formatter.dateFormat = @"YYYYMMdd";
-    return [formatter stringFromDate:date];
-}
-
-/*
- * 数値文字列を整数値に変換する。
- */
-static inline int strToInt(NSString* str){
-    return [str integerValue];
-}
-
-/*
- * システムフォントを取得する。
- */
-static inline UIFont* systemFontOfSize(CGFloat size){
-    return [UIFont systemFontOfSize:size];
-}
-
-/*
- * ビューのスケールを設定する。
- */
-static inline void viewSetScale(UIView* view, CGFloat scale){
-    view.transform = CGAffineTransformMakeScale(scale, scale);
+static inline NSString* dumpAppDefaults(){
+    NSString*      appDomain = [[NSBundle mainBundle] bundleIdentifier];
+    NSDictionary*  dic       = [[NSUserDefaults standardUserDefaults] persistentDomainForName:appDomain];
+    return [NSString stringWithFormat:@"defualts:%@", dic];
 }
 
 
@@ -264,77 +132,34 @@ static inline float getDefaultFloat(NSString* key){
 
 
 /*
- * UserDefaultsの全ての値を取得する。
+ * ステータスバーの非表示にする。
  */
-static inline NSString* dumpAllDefaults(){
-    NSDictionary* dic = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
-    return [NSString stringWithFormat:@"defualts:%@", dic];
-}
-
-/*
- * UserDefaultsのアプリケーション固有の値を取得する。
- */
-static inline NSString* dumpAppDefaults(){
-    NSString*      appDomain = [[NSBundle mainBundle] bundleIdentifier];
-    NSDictionary*  dic       = [[NSUserDefaults standardUserDefaults] persistentDomainForName:appDomain];
-    return [NSString stringWithFormat:@"defualts:%@", dic];
+static inline void statusBarHidden(BOOL bHidden){
+    [UIApplication sharedApplication].statusBarHidden = bHidden;
 }
 
 
 /*
- * UUID文字列を生成する
+ * AppDelegateクラスにViewControllerを設置する
+ * 下記ハンドラで使用する
+ * - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
  */
-static inline NSString* UUIDGenerate(){
-    CFUUIDRef   uuidRef = CFUUIDCreate(kCFAllocatorDefault);
-    CFStringRef uuidStr = CFUUIDCreateString(kCFAllocatorDefault, uuidRef);
-    CFRelease(uuidRef);
+static inline BOOL
+rootViewControllerSetup(UIResponder<UIApplicationDelegate>* appDelegate,
+                        UIViewController*                   viewController){
     
-    NSString* fileName = [NSString stringWithString:(__bridge NSString*)uuidStr];
-    CFRelease(uuidStr);
-    return fileName;
-}
-
-/*
- * URLエンコードする
- */
-static inline NSString* urlEncode(NSString* str){
-    CFStringRef encodedString =
-    CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
-                                            (CFStringRef)str,
-                                            NULL,
-                                            CFSTR(";,/?:@&=+$#"),
-                                            kCFStringEncodingUTF8);
-    
-    NSString* nsString = [NSString stringWithString:(__bridge NSString*)encodedString];
-    CFRelease(encodedString);
-    return nsString;
+    appDelegate.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    [appDelegate.window setRootViewController:viewController];
+    [appDelegate.window makeKeyAndVisible];
+    return YES;
 }
 
 
-/*
- * UIImageのinitWithContentsOfFileメソッドで読み込んだイメージは描画時にデコード処理が入るようになる為、
- * 描画速度が遅くなる。この関数で読み込めばその問題が解消できる。
- */
-static UIImage* imageImmediateLoadWithContentsOfFile(NSString* path){
-    UIImage *image = [[UIImage alloc] initWithContentsOfFile:path];
-    CGImageRef imageRef = [image CGImage];
-    CGRect rect = CGRectMake(0.f, 0.f, CGImageGetWidth(imageRef), CGImageGetHeight(imageRef));
-    CGContextRef bitmapContext = CGBitmapContextCreate(NULL,
-                                                       rect.size.width,
-                                                       rect.size.height,
-                                                       CGImageGetBitsPerComponent(imageRef),
-                                                       CGImageGetBytesPerRow(imageRef),
-                                                       CGImageGetColorSpace(imageRef),
-                                                       CGImageGetBitmapInfo(imageRef)
-                                                       );
-    CGContextDrawImage(bitmapContext, rect, imageRef);
-    CGImageRef decompressedImageRef = CGBitmapContextCreateImage(bitmapContext);
-    UIImage *decompressedImage = [UIImage imageWithCGImage:decompressedImageRef];
-    CGImageRelease(decompressedImageRef);
-    CGContextRelease(bitmapContext);
-    
-    return decompressedImage;
-}
+
+/*------------------------------------------------------------------------------
+                             File IO functions
+ -----------------------------------------------------------------------------*/
+#pragma mark  File IO functions
 
 
 /*
@@ -356,77 +181,199 @@ static NSArray* getFilePathsFromResource(NSString* dir){
 }
 
 /*
- * 指定のサイズに丁度フィットするCGRectを計算する。
+ * PATHをスラッシュでつなげる。
  */
-static CGRect rectToFit(CGSize size, CGSize contentSize){
-    // 縮小率を計算する
-    CGFloat max_w = contentSize.width;
-    CGFloat max_h = contentSize.height;
-    CGFloat wk = max_w / size.width;
-    CGFloat hk = max_h / size.height;
-    CGFloat k=(wk>hk)? hk:wk;
-    
-    // リサイズ後のサイズ
-    CGFloat new_w = size.width * k;
-    CGFloat new_h = size.height* k;
-    CGFloat left = (max_w - new_w) / 2;
-    CGFloat top  = (max_h - new_h) / 2;
-    
-    return CGRectMake(left, top, new_w, new_h);
+static inline NSString* joinPath(NSString* dir, NSString* file){
+    return [NSString stringWithFormat:@"%@/%@", dir, file];
 }
 
 /*
- * 簡単なアラートメッセージを表示する。
+ * PATHからファイル名のみ取り出す。
  */
-static void alertBox(NSString* msg){
-    NSString*    productName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-    UIAlertView* alert       = [[UIAlertView alloc]
-                                initWithTitle:productName
-                                message:msg
-                                delegate:nil
-                                cancelButtonTitle:nil
-                                otherButtonTitles:@"OK", nil];
-    [alert show];
+static inline NSString* getFileNameFromPath(NSString* path){
+    return [path lastPathComponent];
+}
+
+/*
+ * モジュールディレクトリを取得する。
+ */
+static inline NSString* getModulePath(){
+    return [[NSBundle mainBundle] resourcePath];
+}
+
+
+/*------------------------------------------------------------------------------
+                              Chrono functions
+ -----------------------------------------------------------------------------*/
+#pragma mark  Chrono functions
+
+/*
+ * 日付をYYYYMMDD形式の文字列に変換する。
+ */
+static inline NSString* dateFormatToYYYYMMDD(NSDate* date){
+    NSDateFormatter* formatter = [[NSDateFormatter alloc] init];
+    formatter.dateFormat = @"YYYYMMdd";
+    return [formatter stringFromDate:date];
 }
 
 
 /*
- * UIImageViewをparentViewに追加する。 サイズはフィットするように配置される。
- * 成功時には作成したUIImageViewのオブジェクトが返る。
+ * 日付をHH:mm形式の文字列に変換する。
  */
-static UIImageView* imageAddBasicFromResource(NSString* imageName, UIView* parentView)
-{
-    UIImage* image = [UIImage imageNamed:imageName];
-    if (nil == image) {
-        NSLog(@"イメージの読み込みに失敗しました。　%s, %d", __FILE__, __LINE__);
-        return nil;
+static inline NSString* dateFormatToHHmm(NSDate* date){
+    NSDateFormatter* formatter = [[NSDateFormatter alloc] init];
+    formatter.dateFormat = @"HH:mm";
+    return [formatter stringFromDate:date];
+}
+
+
+/*
+ * 現在の時間[sec]をmicrosecondの精度で取得する。
+ */
+static inline double gettime(){
+    struct timeval t;
+    gettimeofday(&t, NULL);
+    return t.tv_sec + (t.tv_usec * 1e-6);
+}
+
+/*
+ * 繰り返しタイマーをセットする。
+ * - (void)tick:(NSTimer*)sender
+ */
+static inline void scheduledTimer(double interval, id target, SEL action){
+    [NSTimer scheduledTimerWithTimeInterval:interval
+                                     target:target
+                                   selector:action
+                                   userInfo:nil
+                                    repeats:YES];
+}
+
+
+
+/*------------------------------------------------------------------------------
+                               View functions
+ -----------------------------------------------------------------------------*/
+#pragma mark View functions
+
+
+/*
+ * UIViewControllerの親子関係を作る。
+ */
+static inline void
+addChildViewController(UIViewController* child, UIViewController* toParent){
+    [toParent addChildViewController:child];
+    [toParent.view addSubview:child.view];
+    [child didMoveToParentViewController:toParent];
+}
+
+/*
+ * ビューのスケールを設定する。
+ */
+static inline void viewSetScale(UIView* view, CGFloat scale){
+    view.transform = CGAffineTransformMakeScale(scale, scale);
+}
+
+/*
+ * dumpSubView関数内部で呼ばれる内部関数
+ */
+static NSString* _dumpSubview(UIView* view, int indent){
+    
+    NSString* strIndent = @"";
+    for (int i=0; i<indent; i++){
+        if (i==indent-1) {
+            strIndent = [strIndent stringByAppendingString:@"+---"];
+        }
+        else {
+            strIndent = [strIndent stringByAppendingString:@"|   "];
+        }
     }
     
-    UIImageView* imageView = [[UIImageView alloc] initWithImage:image];
-    CGRect rect = rectToFit(image.size, parentView.frame.size);
-    [imageView setFrame:rect];
-    [parentView addSubview:imageView];
-    return imageView;
+    NSString* str = [NSString stringWithFormat:@"%@%s\n",
+                     strIndent,
+                     class_getName([view class])];
+    
+    for (UIView* subView in view.subviews){
+        NSString* ret = _dumpSubview(subView, indent+1);
+        str = [str stringByAppendingString:ret];
+    }
+    return str;
+}
+
+
+/*
+ * UIViewのSubViewを階層表示した文字列を返す。
+ */
+static inline NSString* dumpSubview(UIView* view){
+    return _dumpSubview(view, 0);
 }
 
 /*
- * UIImageViewをparentViewに追加する。 サイズはフィットするように配置される。
+ * UIImageのinitWithContentsOfFileメソッドで読み込んだイメージは描画時にデコード処理が入るようになる為、
+ * 描画速度が遅くなる。この関数で読み込めばその問題が解消できる。
+ */
+static inline UIImage*
+imageImmediateLoadWithContentsOfFile(NSString* path){
+    UIImage *image = [[UIImage alloc] initWithContentsOfFile:path];
+    CGImageRef imageRef = [image CGImage];
+    CGRect rect = CGRectMake(0.f, 0.f, CGImageGetWidth(imageRef), CGImageGetHeight(imageRef));
+    CGContextRef bitmapContext = CGBitmapContextCreate(NULL,
+                                                       rect.size.width,
+                                                       rect.size.height,
+                                                       CGImageGetBitsPerComponent(imageRef),
+                                                       CGImageGetBytesPerRow(imageRef),
+                                                       CGImageGetColorSpace(imageRef),
+                                                       CGImageGetBitmapInfo(imageRef)
+                                                       );
+    CGContextDrawImage(bitmapContext, rect, imageRef);
+    CGImageRef decompressedImageRef = CGBitmapContextCreateImage(bitmapContext);
+    UIImage *decompressedImage = [UIImage imageWithCGImage:decompressedImageRef];
+    CGImageRelease(decompressedImageRef);
+    CGContextRelease(bitmapContext);
+    
+    return decompressedImage;
+}
+
+/*
+ * UIImageからUIImageViewを作成し、parentViewに追加する。 サイズはフィットするように配置される。
  * 成功時には作成したUIImageViewのオブジェクトが返る。
  */
-static UIImageView* imageAddBasicFromPath(NSString* imagePath, UIView* parentView)
-{
-    UIImage* image = imageImmediateLoadWithContentsOfFile(imagePath);
-    if (nil == image) {
-        NSLog(@"イメージの読み込みに失敗しました。　%s, %d", __FILE__, __LINE__);
-        return nil;
-    }
-    
+static inline UIImageView*
+imageViewAddToParent(UIImage* image, UIView* parentView){
     UIImageView* imageView = [[UIImageView alloc] initWithImage:image];
     // アスペクト比が崩れないように親ビューにフィットさせる。
     imageView.contentMode = UIViewContentModeScaleAspectFit;
     imageView.frame = parentView.bounds;
     [parentView addSubview:imageView];
     return imageView;
+}
+
+
+/*
+ * UIImageViewをparentViewに追加する。 サイズはフィットするように配置される。
+ * 成功時には作成したUIImageViewのオブジェクトが返る。
+ */
+static inline UIImageView*
+imageAddBasicFromResource(NSString* imageName, UIView* parentView){
+    UIImage* image = [UIImage imageNamed:imageName];
+    if (nil == image) {
+        dmsg(@"イメージの読み込みに失敗しました。");
+        return nil;
+    }
+    return imageViewAddToParent(image, parentView);
+}
+
+/*
+ * UIImageViewをparentViewに追加する。 サイズはフィットするように配置される。
+ * 成功時には作成したUIImageViewのオブジェクトが返る。
+ */
+static inline UIImageView*
+imageAddBasicFromPath(NSString* imagePath, UIView* parentView){
+    UIImage* image = imageImmediateLoadWithContentsOfFile(imagePath);
+    if (nil == image) {
+        dmsg(@"イメージの読み込みに失敗しました。");
+        return nil;
+    }
+    return imageViewAddToParent(image, parentView);
 }
 
 
@@ -558,6 +505,150 @@ static inline UIPinchGestureRecognizer* pinchRecognizerAddToView(UIView* view, i
 
 
 
+
+
+/*------------------------------------------------------------------------------
+                              Other functions
+ -----------------------------------------------------------------------------*/
+#pragma mark Other functions
+
+
+/*
+ * class_getName関数を使用して、クラス名を取得する。
+ */
+static inline NSString* getClassName(id object){
+    return [NSString stringWithUTF8String: class_getName([object class])];
+}
+
+/*
+ * CGSize構造体用の文字列を生成する。
+ */
+static inline NSString* CGSizeToString(CGSize size){
+    return [NSString stringWithFormat: @"%fx%f", size.width, size.height ];
+}
+
+/*
+ * CGPoint構造体用の文字列を生成する。
+ */
+static inline NSString* CGPointToString(CGPoint point){
+    return [NSString stringWithFormat: @"%f,%f", point.x, point.y];
+}
+
+/*
+ * CGRect構造体用の文字列を生成する。
+ */
+static inline NSString* CGRectToString(CGRect rect){
+    return [NSString stringWithFormat: @"%f,%f %fx%f",
+            rect.origin.x, rect.origin.y, rect.size.width, rect.size.height];
+}
+
+
+/*
+ * UIRecogenizerのタッチイベントから、座標を取得する。
+ * view: 基準座標となるビュー
+ */
+static inline CGPoint getTouchPoint(NSSet* touches, UIView* view){
+    UITouch* touch = [touches anyObject];
+    return [touch locationInView:view];
+}
+
+/*
+ * 半透明の黒色
+ */
+static inline UIColor* clearBlack(){
+    return [UIColor colorWithWhite:0.0f alpha:0.5f];
+}
+
+/*
+ * 半透明の白色
+ */
+static inline UIColor* clearWhite(){
+    return [UIColor colorWithWhite:1.0f alpha:0.3f];
+}
+
+
+/*
+ * 数値文字列を整数値に変換する。
+ */
+static inline int strToInt(NSString* str){
+    return [str integerValue];
+}
+
+/*
+ * システムフォントを取得する。
+ */
+static inline UIFont* systemFontOfSize(CGFloat size){
+    return [UIFont systemFontOfSize:size];
+}
+
+
+
+/*
+ * UUID文字列を生成する
+ */
+static inline NSString* UUIDGenerate(){
+    CFUUIDRef   uuidRef = CFUUIDCreate(kCFAllocatorDefault);
+    CFStringRef uuidStr = CFUUIDCreateString(kCFAllocatorDefault, uuidRef);
+    CFRelease(uuidRef);
+    
+    NSString* fileName = [NSString stringWithString:(__bridge NSString*)uuidStr];
+    CFRelease(uuidStr);
+    return fileName;
+}
+
+/*
+ * URLエンコードする
+ */
+static inline NSString* urlEncode(NSString* str){
+    CFStringRef encodedString =
+    CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
+                                            (CFStringRef)str,
+                                            NULL,
+                                            CFSTR(";,/?:@&=+$#"),
+                                            kCFStringEncodingUTF8);
+    
+    NSString* nsString = [NSString stringWithString:(__bridge NSString*)encodedString];
+    CFRelease(encodedString);
+    return nsString;
+}
+
+
+/*
+ * 指定のサイズに丁度フィットするCGRectを計算する。
+ */
+static CGRect rectToFit(CGSize size, CGSize contentSize){
+    // 縮小率を計算する
+    CGFloat max_w = contentSize.width;
+    CGFloat max_h = contentSize.height;
+    CGFloat wk = max_w / size.width;
+    CGFloat hk = max_h / size.height;
+    CGFloat k=(wk>hk)? hk:wk;
+    
+    // リサイズ後のサイズ
+    CGFloat new_w = size.width * k;
+    CGFloat new_h = size.height* k;
+    CGFloat left = (max_w - new_w) / 2;
+    CGFloat top  = (max_h - new_h) / 2;
+    
+    return CGRectMake(left, top, new_w, new_h);
+}
+
+/*
+ * 簡単なアラートメッセージを表示する。
+ */
+static void alertBox(NSString* msg){
+    NSString*    productName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+    UIAlertView* alert       = [[UIAlertView alloc]
+                                initWithTitle:productName
+                                message:msg
+                                delegate:nil
+                                cancelButtonTitle:nil
+                                otherButtonTitles:@"OK", nil];
+    [alert show];
+}
+
+
+
 /*
  * バッテリステートを文字列で取得します。
  * 関数内でbatteryMonitoringEnabledをYESに設定します。
@@ -655,17 +746,6 @@ static inline BOOL orientationPermitForUpAndDownside(UIInterfaceOrientation inte
     return NO;
 }
 
-
-
-/*
- * UIViewControllerの親子関係を作る。
- */
-static inline void
-addChildViewController(UIViewController* child, UIViewController* toParent){
-    [toParent addChildViewController:child];
-    [toParent.view addSubview:child.view];
-    [child didMoveToParentViewController:toParent];
-}
 
 
 /*
