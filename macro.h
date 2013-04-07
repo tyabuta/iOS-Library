@@ -1,5 +1,5 @@
 /*******************************************************************************
-  macro.h 1.5.0.8
+  macro.h 1.5.0.9
 
                               マクロ関数用のヘッダ
  
@@ -200,6 +200,80 @@ static inline NSString* getFileNameFromPath(NSString* path){
 static inline NSString* getModulePath(){
     return [[NSBundle mainBundle] resourcePath];
 }
+
+
+
+
+/*------------------------------------------------------------------------------
+                           Network functions
+ -----------------------------------------------------------------------------*/
+#pragma mark  Network functions
+
+
+/*
+ * 指定のURLをリクエストし、NSDataオブジェクトを取得する。
+ */
+static inline NSData* dataRequestWithURL(NSString* urlString){
+    // URL
+    NSURL* url = [NSURL URLWithString:urlString];
+    
+    // GET Request
+    NSURLRequest*  request  = [NSURLRequest requestWithURL:url];
+    NSURLResponse* response = nil;
+    NSError*       error    = nil;
+    NSData*        data     = [NSURLConnection sendSynchronousRequest:request
+                                                    returningResponse:&response
+                                                                error:&error];
+    return data;
+}
+
+
+/*
+ * 指定のURLでリクエストする。
+ * 取得した内容は文字列として返す。
+ */
+static inline NSString* stringRequestWithURL(NSString* urlString){
+    NSData* data = dataRequestWithURL(urlString);
+    
+    // To string
+    NSString* content = [[NSString alloc] initWithData:data
+                                              encoding:NSUTF8StringEncoding];
+    return content;
+}
+
+
+/*
+ * 指定のURLでリクエストする。
+ * 取得した内容は文字列として返す。
+ */
+static inline NSDictionary* jsonRequestWithURL(NSString* urlString){
+    NSData*   data = dataRequestWithURL(urlString);
+    NSError* error = nil;
+    
+    // To Dictionary
+    NSDictionary* dict = [NSJSONSerialization JSONObjectWithData:data
+                                                         options:0
+                                                           error:&error];
+    
+    return dict;
+}
+
+/*
+ * URLエンコードする
+ */
+static inline NSString* stringEncode(NSString* str){
+    CFStringRef encodedString =
+    CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
+                                            (CFStringRef)str,
+                                            NULL,
+                                            CFSTR(";,/?:@&=+$#"),
+                                            kCFStringEncodingUTF8);
+    
+    NSString* nsString = [NSString stringWithString:(__bridge NSString*)encodedString];
+    CFRelease(encodedString);
+    return nsString;
+}
+
 
 
 /*------------------------------------------------------------------------------
@@ -595,23 +669,6 @@ static inline NSString* UUIDGenerate(){
     CFRelease(uuidStr);
     return fileName;
 }
-
-/*
- * URLエンコードする
- */
-static inline NSString* urlEncode(NSString* str){
-    CFStringRef encodedString =
-    CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
-                                            (CFStringRef)str,
-                                            NULL,
-                                            CFSTR(";,/?:@&=+$#"),
-                                            kCFStringEncodingUTF8);
-    
-    NSString* nsString = [NSString stringWithString:(__bridge NSString*)encodedString];
-    CFRelease(encodedString);
-    return nsString;
-}
-
 
 /*
  * 指定のサイズに丁度フィットするCGRectを計算する。
