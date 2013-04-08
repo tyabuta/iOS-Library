@@ -1,5 +1,5 @@
 /*******************************************************************************
-  macro.h 1.5.0.9
+  macro.h 1.5.0.10
 
                               マクロ関数用のヘッダ
  
@@ -39,6 +39,16 @@
 #define dmsg(...)
 #endif
 
+
+/*
+ * タップできる理想のUIサイズ
+ */
+#define TAPPABLE_SIZE 44
+
+/*
+ * 縦または横のサイズが44ptを確保できない場合に、一方を最小30ptで適用。
+ */
+#define MINIMUM_TAPPABLE_SIZE 30
 
 
 
@@ -329,6 +339,70 @@ static inline void scheduledTimer(double interval, id target, SEL action){
  -----------------------------------------------------------------------------*/
 #pragma mark View functions
 
+
+/*
+ * ビューのヘッダ部にUIToolbarを追加します。
+ */
+static inline UIToolbar* toolbarAddToHeader(UIView* parentView){
+    float w = parentView.bounds.size.width;
+    CGRect rect = CGRectMake(0,0, w, TAPPABLE_SIZE);
+    UIToolbar* toolbar = [[UIToolbar alloc] initWithFrame:rect];
+    [parentView addSubview:toolbar];
+    return toolbar;
+}
+
+/*
+ * ビューのヘッダ部にDoneボタンを持ったUIToolbarを追加します。
+ */
+static inline UIToolbar* toolbarAddToHeaderWithDone(UIView* parentView, id target, SEL action){
+    UIToolbar* toolbar = toolbarAddToHeader(parentView);
+    
+    UIBarButtonItem* buttonItem =
+    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                                  target:target
+                                                  action:action];
+    NSArray* items = [NSArray arrayWithObjects:buttonItem, nil];
+    [toolbar setItems:items animated:YES];
+    
+    return toolbar;
+}
+
+/*
+ * イメージピッカーを表示する。
+ * viewController: プロトコルが実装されたUIViewController
+ *
+ * プロトコル実装
+ * UIViewController<UINavigationControllerDelegate, UIImagePickerControllerDelegate>
+ *
+ * 画像選択後のデリゲート
+ * - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
+ *
+ * 選択キャンセル時のデリゲート
+ * - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+ *
+ */
+static inline void imagePickerShow(UIViewController<UINavigationControllerDelegate, UIImagePickerControllerDelegate>* viewController){
+    UIImagePickerController* picker = [[UIImagePickerController alloc] init];
+    picker.delegate = viewController;
+    picker.allowsEditing = YES;
+    [viewController presentViewController:picker animated:YES completion:NULL];
+}
+
+/*
+ * イメージピッカーが選択したUIImageを取得し、ピッカー表示を消す。
+ */
+static inline UIImage* imagePickerGetPickedImageAndHide(UIImagePickerController* picker, NSDictionary* info){
+    UIImage* image = [info objectForKey:UIImagePickerControllerEditedImage];
+    [picker dismissViewControllerAnimated:YES completion:NULL];
+    return image;
+}
+
+/*
+ * イメージピッカーの表示を消す。
+ */
+static inline void imagePickerHide(UIImagePickerController* picker){
+    [picker dismissViewControllerAnimated:YES completion:NULL];
+}
 
 /*
  * UIViewControllerの親子関係を作る。
@@ -802,47 +876,6 @@ static inline BOOL orientationPermitForUpAndDownside(UIInterfaceOrientation inte
     }
     return NO;
 }
-
-
-
-/*
- * イメージピッカーを表示する。
- * viewController: プロトコルが実装されたUIViewController
- *
- * プロトコル実装
- * UIViewController<UINavigationControllerDelegate, UIImagePickerControllerDelegate>
- *
- * 画像選択後のデリゲート
- * - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
- *
- * 選択キャンセル時のデリゲート
- * - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
- *
- */
-static inline void imagePickerShow(UIViewController<UINavigationControllerDelegate, UIImagePickerControllerDelegate>* viewController){
-    UIImagePickerController* picker = [[UIImagePickerController alloc] init];
-    picker.delegate = viewController;
-    picker.allowsEditing = YES;
-    [viewController presentViewController:picker animated:YES completion:NULL];
-}
-
-/*
- * イメージピッカーが選択したUIImageを取得し、ピッカー表示を消す。
- */
-static inline UIImage* imagePickerGetPickedImageAndHide(UIImagePickerController* picker, NSDictionary* info){
-    UIImage* image = [info objectForKey:UIImagePickerControllerEditedImage];
-    [picker dismissViewControllerAnimated:YES completion:NULL];
-    return image;
-}
-
-/*
- * イメージピッカーの表示を消す。
- */
-static inline void imagePickerHide(UIImagePickerController* picker){
-    [picker dismissViewControllerAnimated:YES completion:NULL];
-}
-
-
 
 
 
