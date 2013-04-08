@@ -1,5 +1,5 @@
 /*******************************************************************************
-  macro.h 1.5.0.10
+  macro.h 1.5.0.11
 
                               マクロ関数用のヘッダ
  
@@ -147,6 +147,16 @@ static inline float getDefaultFloat(NSString* key){
 static inline void statusBarHidden(BOOL bHidden){
     [UIApplication sharedApplication].statusBarHidden = bHidden;
 }
+
+/*
+ * ネットワーク接続中のアイコン表示にする。
+ * bVisible = true  接続中
+ *            false 何も表示しない。
+ */
+static inline void networkActivityIndicator(BOOL bVisible){
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = bVisible;
+}
+
 
 
 /*
@@ -338,6 +348,25 @@ static inline void scheduledTimer(double interval, id target, SEL action){
                                View functions
  -----------------------------------------------------------------------------*/
 #pragma mark View functions
+
+/*
+ * ビューコントローラを登場させる。
+ */
+static inline void
+presentViewController(UIViewController* currentViewController,
+                      UIViewController* newViewController)
+{
+    [currentViewController presentViewController:newViewController
+                                        animated:YES
+                                      completion:NULL];
+}
+
+/*
+ * ビューコントローラをどける。
+ */
+static inline void dismissViewController(UIViewController* viewController){
+    [viewController dismissViewControllerAnimated:YES completion:NULL];
+}
 
 
 /*
