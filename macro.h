@@ -355,6 +355,21 @@ static inline void scheduledTimer(double interval, id target, SEL action){
 #pragma mark View functions
 
 /*
+ * 簡易なUISliderをparentViewに追加する。
+ * イベントも追加する。
+ * - (void)sliderValueChanged:(UISlider*)sender
+ */
+static inline UISlider*
+sliderAddBasic(CGRect frame, UIView* parentView, id target, SEL action){
+    UISlider* slider = [[UISlider alloc] initWithFrame:frame];
+    [slider addTarget:target
+               action:action
+     forControlEvents:UIControlEventValueChanged];
+    [parentView addSubview:slider];
+    return slider;
+}
+
+/*
  * ビューコントローラを登場させる。
  */
 static inline void
