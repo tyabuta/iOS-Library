@@ -1,5 +1,5 @@
 /*******************************************************************************
-  macro.h 1.5.0.11
+  macro.h 1.5.1.12
 
                               マクロ関数用のヘッダ
  
@@ -49,6 +49,11 @@
  * 縦または横のサイズが44ptを確保できない場合に、一方を最小30ptで適用。
  */
 #define MINIMUM_TAPPABLE_SIZE 30
+
+/*
+ * システムボリュームの丁度一目盛り分の値
+ */
+#define SOUND_VOLUME_ONE 0.0625f
 
 
 
@@ -964,33 +969,31 @@ static inline void tweetComposeShow(NSString* initialTweet, UIImage* image, UIVi
 /*
  * 音量を設定する。0-1
  */
-static inline void systemVolumeSet(float volume){
-    MPMusicPlayerController* musicPlayer = [MPMusicPlayerController applicationMusicPlayer];
+static inline void systemSetVolume(float volume){
+    MPMusicPlayerController* musicPlayer =
+    [MPMusicPlayerController applicationMusicPlayer];
     musicPlayer.volume = volume;
-}
-
-/*
- * 今の音量から増減量を指定する。0-1
- */
-static inline void systemVolumeAdditional(float addVolume){
-    MPMusicPlayerController* musicPlayer = [MPMusicPlayerController applicationMusicPlayer];
-    musicPlayer.volume += addVolume;
 }
 
 /*
  * 今の音量を取得する。0-1
  */
-static inline float systemVolumeGet(float volume){
-    MPMusicPlayerController* musicPlayer = [MPMusicPlayerController applicationMusicPlayer];
-    return musicPlayer.volume = volume;
+static inline float systemGetVolume(){
+    MPMusicPlayerController* musicPlayer =
+    [MPMusicPlayerController applicationMusicPlayer];
+    return musicPlayer.volume;
 }
 
 /*
- * システムボリュームの丁度一目盛り分の値を取得する。
+ * 今の音量から増減量を指定する。0-1
  */
-static inline float systemVolumeOne(){
-    return 0.0625f;
+static inline void systemAddVolume(float addVolume){
+    MPMusicPlayerController* musicPlayer =
+    [MPMusicPlayerController applicationMusicPlayer];
+    musicPlayer.volume += addVolume;
 }
+
+
 #endif // MP_EXTERN_CLASS_AVAILABLE
 
 
