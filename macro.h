@@ -796,7 +796,7 @@ static inline NSString* UUIDGenerate(){
 /*
  * 指定のサイズに丁度フィットするCGRectを計算する。
  */
-static CGRect rectToFit(CGSize size, CGSize contentSize){
+static inline CGRect rectToFit(CGSize size, CGSize contentSize){
     // 縮小率を計算する
     CGFloat max_w = contentSize.width;
     CGFloat max_h = contentSize.height;
@@ -816,7 +816,7 @@ static CGRect rectToFit(CGSize size, CGSize contentSize){
 /*
  * 簡単なアラートメッセージを表示する。
  */
-static void alertBox(NSString* msg){
+static inline void alertBox(NSString* msg){
     NSString*    productName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
     UIAlertView* alert       = [[UIAlertView alloc]
                                 initWithTitle:productName
@@ -833,7 +833,7 @@ static void alertBox(NSString* msg){
  * バッテリステートを文字列で取得します。
  * 関数内でbatteryMonitoringEnabledをYESに設定します。
  */
-static NSString* getBatteryState(){
+static inline NSString* getBatteryState(){
     UIDevice* device = [UIDevice currentDevice];
     device.batteryMonitoringEnabled = YES;
     UIDeviceBatteryState state = device.batteryState;
@@ -860,7 +860,7 @@ static NSString* getBatteryState(){
  * バッテリレベルを文字列で取得します。
  * 関数内でbatteryMonitoringEnabledをYESに設定します。
  */
-static NSString* getBatteryLevel(){
+static inline NSString* getBatteryLevel(){
     UIDevice* device = [UIDevice currentDevice];
     device.batteryMonitoringEnabled = YES;
     float batteryLevel = device.batteryLevel;
@@ -886,7 +886,7 @@ static NSString* getBatteryLevel(){
  * UIDeviceBatteryLevelDidChangeNotification
  * UIDeviceBatteryStateDidChangeNotification
  */
-static void registerBatteryNotificationObserver(id observer, SEL selector){
+static inline void registerBatteryNotificationObserver(id observer, SEL selector){
     UIDevice* device = [UIDevice currentDevice];
     device.batteryMonitoringEnabled = YES;
     
