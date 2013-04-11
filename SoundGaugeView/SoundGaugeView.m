@@ -1,5 +1,5 @@
 
-#import "SoundGaugeController.h"
+#import "SoundGaugeView.h"
 #import <MediaPlayer/MediaPlayer.h>
 
 /*
@@ -75,37 +75,41 @@ static inline float systemGetVolume(){
     return musicPlayer.volume;
 }
 
-@interface SoundGaugeController ()
-@end
-
-@implementation SoundGaugeController
 
 
-- (id)init
+
+
+
+
+
+
+
+@implementation SoundGaugeView
 {
-    if (self = [super initWithNibName:nil bundle:nil]){
-        // init
-    }
-    return self;
+    UIImageView* _imageView;
+    UISlider*    _sliderView;
 }
 
-- (void)viewDidLoad
+- (id)initWithFrame:(CGRect)frame
 {
-    [super viewDidLoad];
-    
-    // Sound Image
-    UIImageView* imageView = imageAddBasicFromResource(@"sound.png", self.view);
-    imageView.frame = CGRectMake(10, 15, 32,32);
-    
-    // Slider
-    float w = self.view.bounds.size.width;
-    UISlider* slider = sliderAddBasic(CGRectMake(50, 10, w - 60, 44),
-                                      self.view,
-                                      self,
-                                      @selector(sliderValueChanged:));
-    float vol = systemGetVolume();
-    slider.value = vol;
-    [self.view addSubview:slider];
+    self = [super initWithFrame:frame];
+    if (self) {
+        // Sound Image
+        _imageView = imageAddBasicFromResource(@"sound.png", self);
+        
+        // Slider
+        float w = self.bounds.size.width;
+        _sliderView = sliderAddBasic(CGRectMake(50, 10, w - 60, 44),
+                                          self,
+                                          self,
+                                          @selector(sliderValueChanged:));
+        float vol = systemGetVolume();
+        _sliderView.value = vol;
+        [self addSubview:_sliderView];
+        
+        self.backgroundColor = [UIColor clearColor];
+    }
+    return self;
 }
 
 - (void)sliderValueChanged:(UISlider*)slider
@@ -113,6 +117,11 @@ static inline float systemGetVolume(){
     systemSetVolume(slider.value);
 }
 
+- (void)layoutSubviews{
+    _imageView.frame = CGRectMake(10, 15, 32,32);
+
+    float w = self.bounds.size.width;
+    _sliderView.frame = CGRectMake(50, 10, w - 60, 44);
+}
+
 @end
-
-
