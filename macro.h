@@ -269,18 +269,17 @@ static inline NSString* stringRequestWithURL(NSString* urlString){
 
 /*
  * 指定のURLでリクエストする。
- * 取得した内容は文字列として返す。
+ * 取得した内容はディクショナリとして返す。
  */
 static inline NSDictionary* jsonRequestWithURL(NSString* urlString){
     NSData*   data = dataRequestWithURL(urlString);
     NSError* error = nil;
     
-    // To Dictionary
-    NSDictionary* dict = [NSJSONSerialization JSONObjectWithData:data
-                                                         options:0
-                                                           error:&error];
-    
-    return dict;
+    // To dictionary
+    NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:data
+                                                               options:0
+                                                                 error:&error];
+    return dictionary;
 }
 
 /*
