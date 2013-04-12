@@ -700,6 +700,34 @@ static inline UIPinchGestureRecognizer* pinchRecognizerAddToView(UIView* view, i
 }
 
 
+/*------------------------------------------------------------------------------
+ QuartzCore functions
+ -----------------------------------------------------------------------------*/
+#pragma mark QuartzCore functions
+
+/*
+ * #import <QuartzCore/QuartzCore.h>
+ */
+#ifdef QUARTZCORE_H
+
+/*
+ * ビューのコーナに丸くマスクをかける。
+ */
+static inline void layerStyleRoundRect(UIView* view){
+    view.layer.cornerRadius = 5.0f;
+    view.layer.masksToBounds = YES;
+}
+
+/*
+ * クリアブラックの角丸スタイルを設定する。
+ */
+static inline void layerStyleRoundRectAndClearBlack(UIView* view){
+    view.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.5f];
+    layerStyleRoundRect(view);
+}
+
+#endif // QUARTZCORE_H
+
 
 
 
@@ -1011,20 +1039,6 @@ static inline void systemAddVolume(float addVolume){
 #endif // MP_EXTERN_CLASS_AVAILABLE
 
 
-/*
- * #import <QuartzCore/QuartzCore.h>
- */
-#ifdef QUARTZCORE_H
-
-/*
- * ビューのコーナに丸くマスクをかける。
- */
-static inline void viewSetCornerRadiusAndMask(UIView* view){
-    view.layer.cornerRadius = 5.0f;
-    view.layer.masksToBounds = YES;
-}
-
-#endif // QUARTZCORE_H
 
 
 
