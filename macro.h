@@ -354,6 +354,54 @@ static inline void scheduledTimer(double interval, id target, SEL action){
 #pragma mark View functions
 
 /*
+ * ビューフレームのボトム値を設定する。
+ * 指定ビューはsuperviewに追加されている必要があります。
+ */
+static inline void viewSetBottom(UIView* view, float bottom){
+    CGRect frame = view.frame;
+    frame.origin.y =
+    view.superview.bounds.size.height - frame.size.height - bottom;
+    view.frame = frame;
+}
+
+/*
+ * ビューフレームのRight値を設定する。
+ * 指定ビューはsuperviewに追加されている必要があります。
+ */
+static inline void viewSetRight(UIView* view, float right){
+    CGRect frame = view.frame;
+    frame.origin.x =
+    view.superview.bounds.size.width - frame.size.width - right;
+    view.frame = frame;
+}
+
+/*
+ * 指定ビューのsuperviewからみて、水平方向に中心に配置する。
+ * 指定ビューはsuperviewに追加されている必要があります。
+ */
+static inline void viewHorizontalCenter(UIView* view){
+    float view_width      = view.bounds.size.width;
+    float superview_width = view.superview.bounds.size.width;
+    float left            = (superview_width - view_width) / 2;
+    CGRect new_frame = view.frame;
+    new_frame.origin.x = left;
+    view.frame = new_frame;
+}
+
+/*
+ * 指定ビューのsuperviewからみて、垂直方向に中心に配置する。
+ * 指定ビューはsuperviewに追加されている必要があります。
+ */
+static inline void viewVerticalCenter(UIView* view){
+    float view_height      = view.bounds.size.height;
+    float superview_height = view.superview.bounds.size.height;
+    float top              = (superview_height - view_height) / 2;
+    CGRect new_frame = view.frame;
+    new_frame.origin.y = top;
+    view.frame = new_frame;
+}
+
+/*
  * 簡易なUISliderをparentViewに追加する。
  * イベントも追加する。
  * - (void)sliderValueChanged:(UISlider*)sender
