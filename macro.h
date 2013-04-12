@@ -1,5 +1,5 @@
 /*******************************************************************************
-  macro.h 1.5.1.12
+  macro.h 1.6.0.13
 
                               マクロ関数用のヘッダ
  
@@ -802,6 +802,126 @@ static inline void layerStyleRoundRectAndSmokeWhite(UIView* view){
 
 
 
+/*------------------------------------------------------------------------------
+ CoreGraphics functions
+ -----------------------------------------------------------------------------*/
+#pragma mark CoreGraphics functions
+
+/*
+ * 角丸四角形を描画する
+ */
+static inline void
+drawRoundRect(CGContextRef context, CGRect rect, CGFloat radius, CGColorRef color){
+    
+    CGContextSetFillColorWithColor(context, color);
+    
+    float left  = rect.origin.x;
+    float top   = rect.origin.y;
+    float right = left + rect.size.width;
+    float bottom= top  + rect.size.height;
+    
+    CGContextMoveToPoint(context, left, top + (rect.size.height/2));
+    CGContextAddArcToPoint(context,  left,    top, right,    top, radius);
+    CGContextAddArcToPoint(context, right,    top, right, bottom, radius);
+    CGContextAddArcToPoint(context, right, bottom,  left, bottom, radius);
+    CGContextAddArcToPoint(context,  left, bottom,  left,    top, radius);
+    CGContextClosePath(context);
+    CGContextFillPath(context);
+}
+
+
+/*
+ * コンテキストに角丸矩形のPathを追加する。
+ */
+static inline void
+CGContextAddRoundRect(CGContextRef context, CGRect rect, CGFloat radius){
+    float top   = rect.origin.y;
+    float bottom= top  + rect.size.height;
+    float left  = rect.origin.x;
+    float right = left + rect.size.width;
+    
+    CGContextMoveToPoint(context, left, top + (rect.size.height/2));
+    CGContextAddArcToPoint(context,  left,    top, right,    top, radius);
+    CGContextAddArcToPoint(context, right,    top, right, bottom, radius);
+    CGContextAddArcToPoint(context, right, bottom,  left, bottom, radius);
+    CGContextAddArcToPoint(context,  left, bottom,  left,    top, radius);
+    CGContextClosePath(context);
+}
+
+/*
+ * コンテキストに角丸矩形のPathを追加する。
+ * UIRectCorner列挙体を使用して、丸める角を指定できる。
+ */
+static inline void
+CGContextAddRoundRectByRoundingCorners
+(CGContextRef context, CGRect rect, CGFloat radius, UIRectCorner corners){
+    
+    float top   = rect.origin.y;
+    float middle= top + (rect.size.height/2);
+    float bottom= top  + rect.size.height;
+    
+    float left  = rect.origin.x;
+    float center= rect.origin.x + (rect.size.width/2);
+    float right = left + rect.size.width;
+    
+    
+    CGContextMoveToPoint(context, left, middle);
+    
+    CGContextAddArcToPoint(context,
+                           left,top, center,top,
+                           (corners & UIRectCornerTopLeft)?
+                           radius : 0.0f);
+    
+    CGContextAddArcToPoint(context,
+                           right,top, right,middle,
+                           (corners & UIRectCornerTopRight)?
+                           radius : 0.0f);
+    
+    CGContextAddArcToPoint(context,
+                           right,bottom, center,bottom,
+                           (corners & UIRectCornerBottomRight)?
+                           radius : 0.0f);
+    
+    CGContextAddArcToPoint(context,
+                           left,bottom, left,middle,
+                           (corners & UIRectCornerBottomLeft)?
+                           radius : 0.0f);
+    
+    CGContextClosePath(context);
+}
+
+/*
+ * ２色の線形グラデーションを行う。
+ */
+static inline void CGContextDrawLinearGradientWithTwoColor
+(CGContextRef context,
+ CGColorRef color1, CGColorRef color2,
+ CGPoint    point1, CGPoint    point2)
+{
+    const float* c1 = CGColorGetComponents(color1);
+    const float* c2 = CGColorGetComponents(color2);
+    CGFloat components[8];
+    for (int i=0; i<4; i++){
+        components[i]   = c1[i];
+        components[i+4] = c2[i];
+    }
+    
+    size_t num_locations = 2;
+    CGFloat locations[2] = { 0.0, 1.0 };
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGGradientRef gradient =
+    CGGradientCreateWithColorComponents(colorSpace, components, locations, num_locations);
+    CGContextDrawLinearGradient(context, gradient, point1, point2, 0);
+    
+    CGColorSpaceRelease(colorSpace);
+    CGGradientRelease(gradient);
+}
+
+
+
+
+
+
 
 /*------------------------------------------------------------------------------
                               Other functions
@@ -1024,32 +1144,6 @@ static inline BOOL orientationPermitForUpAndDownside(UIInterfaceOrientation inte
     }
     return NO;
 }
-
-
-
-/*
- * 角丸四角形を描画する
- */
-static inline void
-drawRoundRect(CGContextRef context, CGRect rect, CGFloat radius, CGColorRef color){
-    
-    CGContextSetFillColorWithColor(context, color);
-    
-    float left  = rect.origin.x;
-    float top   = rect.origin.y;
-    float right = left + rect.size.width;
-    float bottom= top  + rect.size.height;
-    
-    CGContextMoveToPoint(context, left, top + (rect.size.height/2));
-    CGContextAddArcToPoint(context,  left,    top, right,    top, radius);
-    CGContextAddArcToPoint(context, right,    top, right, bottom, radius);
-    CGContextAddArcToPoint(context, right, bottom,  left, bottom, radius);
-    CGContextAddArcToPoint(context,  left, bottom,  left,    top, radius);
-    CGContextClosePath(context);
-    CGContextFillPath(context);
-}
-
-
 
 
 /*
