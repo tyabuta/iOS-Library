@@ -94,33 +94,104 @@ static inline void removeObserverOfNotificationCenter(id observer){
     [[NSNotificationCenter defaultCenter] removeObserver:observer];
 }
 
+
 /*
- * UIImageからUIImageViewを作成し、parentViewに追加する。 サイズはフィットするように配置される。
- * 成功時には作成したUIImageViewのオブジェクトが返る。
+ * コンテキストに角丸矩形のPathを追加する。
  */
-static inline UIImageView*
-imageViewAddToParent(UIImage* image, UIView* parentView){
-    UIImageView* imageView = [[UIImageView alloc] initWithImage:image];
-    // アスペクト比が崩れないように親ビューにフィットさせる。
-    imageView.contentMode = UIViewContentModeScaleAspectFit;
-    imageView.frame = parentView.bounds;
-    [parentView addSubview:imageView];
-    return imageView;
+static inline void
+CGContextAddRoundRect(CGContextRef context, CGRect rect, CGFloat radius){
+    float top   = rect.origin.y;
+    float bottom= top  + rect.size.height;
+    float left  = rect.origin.x;
+    float right = left + rect.size.width;
+    
+    CGContextMoveToPoint(context, left, top + (rect.size.height/2));
+    CGContextAddArcToPoint(context,  left,    top, right,    top, radius);
+    CGContextAddArcToPoint(context, right,    top, right, bottom, radius);
+    CGContextAddArcToPoint(context, right, bottom,  left, bottom, radius);
+    CGContextAddArcToPoint(context,  left, bottom,  left,    top, radius);
+    CGContextClosePath(context);
 }
 
 /*
- * UIImageViewをparentViewに追加する。 サイズはフィットするように配置される。
- * 成功時には作成したUIImageViewのオブジェクトが返る。
+ * コンテキストに角丸矩形のPathを追加する。
+ * UIRectCorner列挙体を使用して、丸める角を指定できる。
  */
-static inline UIImageView*
-imageAddBasicFromResource(NSString* imageName, UIView* parentView){
-    UIImage* image = [UIImage imageNamed:imageName];
-    if (nil == image) {
-        dmsg(@"イメージの読み込みに失敗しました。");
-        return nil;
-    }
-    return imageViewAddToParent(image, parentView);
+static inline void
+CGContextAddRoundRectByRoundingCorners
+(CGContextRef context, CGRect rect, CGFloat radius, UIRectCorner corners){
+    
+    float top   = rect.origin.y;
+    float middle= top + (rect.size.height/2);
+    float bottom= top  + rect.size.height;
+    
+    float left  = rect.origin.x;
+    float center= rect.origin.x + (rect.size.width/2);
+    float right = left + rect.size.width;
+    
+    
+    CGContextMoveToPoint(context, left, middle);
+    
+    CGContextAddArcToPoint(context,
+                           left,top, center,top,
+                           (corners & UIRectCornerTopLeft)?
+                           radius : 0.0f);
+    
+    CGContextAddArcToPoint(context,
+                           right,top, right,middle,
+                           (corners & UIRectCornerTopRight)?
+                           radius : 0.0f);
+    
+    CGContextAddArcToPoint(context,
+                           right,bottom, center,bottom,
+                           (corners & UIRectCornerBottomRight)?
+                           radius : 0.0f);
+    
+    CGContextAddArcToPoint(context,
+                           left,bottom, left,middle,
+                           (corners & UIRectCornerBottomLeft)?
+                           radius : 0.0f);
+    
+    CGContextClosePath(context);
 }
+
+/*
+ * ２色の線形グラデーションを行う。
+ */
+static inline void CGContextDrawLinearGradientWithTwoColor
+(CGContextRef context,
+ CGColorRef color1, CGColorRef color2,
+ CGPoint    point1, CGPoint    point2)
+{
+    const float* c1 = CGColorGetComponents(color1);
+    const float* c2 = CGColorGetComponents(color2);
+    CGFloat components[8];
+    for (int i=0; i<4; i++){
+        components[i]   = c1[i];
+        components[i+4] = c2[i];
+    }
+    
+    size_t num_locations = 2;
+    CGFloat locations[2] = { 0.0, 1.0 };
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGGradientRef gradient =
+    CGGradientCreateWithColorComponents(colorSpace, components, locations, num_locations);
+    CGContextDrawLinearGradient(context, gradient, point1, point2, 0);
+    
+    CGColorSpaceRelease(colorSpace);
+    CGGradientRelease(gradient);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -130,22 +201,52 @@ imageAddBasicFromResource(NSString* imageName, UIView* parentView){
 #pragma mark Class implementation
 
 
+static const float SMALL_RADIUS = 5.0f;
+static const float LARGE_RADIUS = 10.0f;
+static const float SHADOW_SIZE  = 3.0f;
+static const float BLUR_SIZE    = 3.0f;
+
+
 @implementation BatteryGaugeView
 {
-    CGRect    _gaugeRect;
-    float     _battery;
-    NSString* _display;
+    float     _batteryLevel;
+    UILabel*  _displayLabel;
+    
+    // バッテリー外枠矩形
+    CGRect _largeFrame;
 
+    // バッテリー内枠矩形
+    CGRect _smallFrame;
+
+    // バッテリー枠の突起用矩形
+    CGRect _projectionFrame;
+
+    // バッテリー容量ゲージ矩形
+    CGRect _gaugeFrame;
 }
 
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
-        // Initialization code
-        imageAddBasicFromResource(@"battery.png", self);
+        
+        // 背景色（デフォルトでクリアカラー）
+        self.backgroundColor = [UIColor clearColor];
+
+        // バッテリー通知の登録
         registerBatteryNotificationObserver(self, @selector(update));
 
+        // パーセント表示用のラベル
+        _displayLabel = [[UILabel alloc] initWithFrame:CGRectNull];
+        [self addSubview:_displayLabel];
+        _displayLabel.textAlignment   = NSTextAlignmentCenter;
+        _displayLabel.shadowOffset    = CGSizeMake(1.0f, 1.0f);
+        _displayLabel.shadowColor     = [UIColor blackColor];
+        _displayLabel.textColor       = [UIColor yellowColor];
+        _displayLabel.backgroundColor = [UIColor clearColor];
+        _displayLabel.font            = [UIFont systemFontOfSize:22.0f];
+
+        // 初回更新
         [self update];
     }
     return self;
@@ -153,71 +254,135 @@ imageAddBasicFromResource(NSString* imageName, UIView* parentView){
 
 - (void)dealloc
 {
+    // バッテリー通知登録の抹消
     removeObserverOfNotificationCenter(self);
+}
+
+- (void)layoutSubviews{
+
+    const float margin = 10.0f;
+    const float border = 5.0f;
+    const float projectionWidth  = 8.0f;
+    const float projectionHeight = 20.0f;
+
+    CGRect frame = self.bounds;
+    _largeFrame = CGRectMake(margin, margin,
+                             frame.size.width  - projectionWidth - (margin*2),
+                             frame.size.height - (margin*2));
+    
+    _smallFrame = CGRectInset(_largeFrame, border, border);
+    
+    _projectionFrame = CGRectMake(CGRectGetMaxX(_largeFrame),
+                                  (frame.size.height - projectionHeight) / 2,
+                                  projectionWidth,
+                                  projectionHeight);
+    
+    _displayLabel.frame = _smallFrame;
 }
 
 
 - (void)update
 {
     UIDevice* device = [UIDevice currentDevice];
-    _battery = device.batteryLevel;
+    _batteryLevel = device.batteryLevel;
     
-    if (_battery > 0.0f){
-        _display = [NSString stringWithFormat:@"%3d%%", (int)(_battery*100.0f)];
+    if (_batteryLevel > 0.0f){
+        _displayLabel.text = [NSString stringWithFormat:@"%3d%%", (int)(_batteryLevel*100.0f)];
     }
     else {
-        _display = @"999%";
+        _displayLabel.text = @"---%";
     }
 
-    float w = 92 * ((_battery<0.0f)? 1.0f:_battery);
-    _gaugeRect = CGRectMake(22, 20, w, 45);
     
     [self setNeedsDisplay];
 }
 
 
+#pragma mark Draw functions
+
 - (void)drawRect:(CGRect)rect
 {
-    // Drawing code
     CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    CGContextSaveGState(context);
-    
-    // バッテリー容量の描画枠
-    UIBezierPath* bezierPath = [UIBezierPath bezierPathWithRoundedRect:_gaugeRect
-                                                          cornerRadius:5];
-    CGContextSetFillColorWithColor(context, [UIColor greenColor].CGColor);
-    CGContextSetShadow(context, CGSizeMake(4,4), 2);
-    [bezierPath fill];
-    
-    // グラデーション描画
-    [bezierPath addClip];
-    size_t num_locations = 2;
-    CGFloat locations[2] = { 0.0, 1.0 };
-    CGFloat components[8] = {
-        0.5,  1.0,   0.5,  1.0, // Start color
-        0.0,  0.7,   0,    1.0  // End color
-    };
-    
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGGradientRef gradient =
-    CGGradientCreateWithColorComponents(colorSpace, components, locations, num_locations);
-    
-    CGPoint p1 = _gaugeRect.origin;
-    CGPoint p2 = CGPointMake(_gaugeRect.origin.x,
-                             _gaugeRect.origin.y + _gaugeRect.size.height);
-    CGContextDrawLinearGradient(context, gradient, p1, p2, 0);
-    
-    CGColorSpaceRelease(colorSpace);
-    CGGradientRelease(gradient);
-
-
-    CGContextRestoreGState(context);
-    
-    // バッテリー残量描画
-    CGContextSetShadow(context, CGSizeMake(2,2), 2);
-    CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
-    [_display drawAtPoint:CGPointMake(38,28) withFont:[UIFont systemFontOfSize:24]];
+    [self drawBatteryFrame:context];
+    [self drawBatteryGauge:context];
 }
 
+- (void)drawBatteryGauge:(CGContextRef)context {
+    CGContextSaveGState(context);
+
+    CGContextSetShouldAntialias(context, YES);
+        
+    // 容量ゲージの幅を計算
+    _gaugeFrame = CGRectInset(_smallFrame, 4, 4);
+    _gaugeFrame.size.width *= ((_batteryLevel<0.0f)? 1.0f:_batteryLevel);
+
+    // フレーム枠内に描画エリアを限定
+    CGContextAddRoundRect(context, _smallFrame, SMALL_RADIUS);
+    CGContextClip(context);
+    
+    // ゲージ用のPathを作成
+    CGPathRef path = NULL;
+    CGContextAddRoundRect(context, _gaugeFrame, SMALL_RADIUS);
+    path = CGContextCopyPath(context);
+    
+    // 影の描画
+    CGContextSetRGBFillColor(context, 0.5f, 1.0f, 0.5f, 1.0f);
+    CGContextSetShadow(context, CGSizeMake(SHADOW_SIZE, SHADOW_SIZE), BLUR_SIZE);
+    CGContextFillPath(context);
+    
+    // グラデーション描画
+    CGContextAddPath(context, path);
+    CGContextClip(context);
+    UIColor* color1 = [UIColor colorWithRed:0.3f green:1.0f blue:0.3f alpha:1.0f];
+    UIColor* color2 = [UIColor colorWithRed:0.2f green:0.5f blue:0.2f alpha:1.0f];
+    CGPoint p1 = CGPointMake(0, CGRectGetMinY(_gaugeFrame));
+    CGPoint p2 = CGPointMake(0, CGRectGetMaxY(_gaugeFrame));
+    CGContextDrawLinearGradientWithTwoColor(context, color1.CGColor, color2.CGColor, p1, p2);
+    
+    // Pathの解放
+    CGPathRelease(path);
+    
+    CGContextRestoreGState(context);
+}
+
+- (void)drawBatteryFrame:(CGContextRef)context {
+    CGContextSaveGState(context);
+    
+    CGContextSetShouldAntialias(context, YES);
+    
+    // Pathの作成
+    CGPathRef path = NULL;
+    CGContextAddRoundRect(context, _largeFrame, LARGE_RADIUS);
+    CGContextAddRoundRect(context, _smallFrame, SMALL_RADIUS);
+    CGContextAddRoundRectByRoundingCorners(context, _projectionFrame,
+                                           SMALL_RADIUS,
+                                           UIRectCornerTopRight | UIRectCornerBottomRight);
+    path = CGContextCopyPath(context);
+    
+    // 影の描画
+    CGContextSetRGBFillColor(context, 0.8f, 0.8f, 0.8f, 1.0f);
+    CGContextSetShadow(context, CGSizeMake(SHADOW_SIZE, SHADOW_SIZE), BLUR_SIZE);
+    CGContextEOFillPath(context);
+
+    // グラデーション描画
+    CGContextAddPath(context, path);
+    CGContextEOClip(context);
+    UIColor* color1 = [UIColor colorWithRed:1.0f green:1.0f blue:1.0f alpha:1.0f];
+    UIColor* color2 = [UIColor colorWithRed:0.3f green:0.3f blue:0.3f alpha:1.0f];
+    CGPoint p1 = CGPointMake(0, CGRectGetMinY(_largeFrame));
+    CGPoint p2 = CGPointMake(0, CGRectGetMaxY(_largeFrame));
+    CGContextDrawLinearGradientWithTwoColor(context, color1.CGColor, color2.CGColor, p1, p2);
+
+    // Pathの解放
+    CGPathRelease(path);
+
+    CGContextRestoreGState(context);
+}
+
+
+
 @end
+
+
+
+
