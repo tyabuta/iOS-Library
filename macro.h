@@ -759,6 +759,22 @@ static inline UIPinchGestureRecognizer* pinchRecognizerAddToView(UIView* view, i
 #ifdef QUARTZCORE_H
 
 /*
+ * ビューの影を設定する。
+ */
+static inline void layerStyleShadow(UIView* view){
+    view.layer.shadowOffset  = CGSizeMake(3.0f, 3.0f);
+    view.layer.shadowOpacity = 0.7f;
+}
+
+/*
+ * ビューの影と枠を設定する。
+ */
+static inline void layerStyleShadowAndBorder(UIView* view){
+    layerStyleShadow(view);
+    view.layer.borderWidth = 3.0f;
+}
+
+/*
  * ビューのコーナに丸くマスクをかける。
  */
 static inline void layerStyleRoundRect(UIView* view){
@@ -771,6 +787,14 @@ static inline void layerStyleRoundRect(UIView* view){
  */
 static inline void layerStyleRoundRectAndClearBlack(UIView* view){
     view.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.5f];
+    layerStyleRoundRect(view);
+}
+
+/*
+ * クリアブラックの角丸スタイルを設定する。
+ */
+static inline void layerStyleRoundRectAndSmokeWhite(UIView* view){
+    view.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.5f];
     layerStyleRoundRect(view);
 }
 
