@@ -928,6 +928,31 @@ static inline void CGContextDrawLinearGradientWithTwoColor
  -----------------------------------------------------------------------------*/
 #pragma mark Other functions
 
+/*
+ * デバイス向きを考慮した、適切なスクリーンサイズを取得する。
+ * (ステータスバーの幅を引いた値)
+ */
+static inline CGSize
+UIInterfaceOrientationConsideredScreenSize(UIInterfaceOrientation interfaceOrientation){
+    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+    return UIInterfaceOrientationIsPortrait(interfaceOrientation)?
+    screenSize : CGSizeMake(screenSize.height, screenSize.width);
+}
+
+/*
+ * カレントデバイスがiPadならYES
+ */
+static inline BOOL is_ipad(){
+    return (UIUserInterfaceIdiomPad == [UIDevice currentDevice].userInterfaceIdiom);
+}
+
+/*
+ * カレントデバイスがiPadならYES
+ */
+static inline BOOL is_iphone(){
+    return (UIUserInterfaceIdiomPhone == [UIDevice currentDevice].userInterfaceIdiom);
+}
+
 
 /*
  * class_getName関数を使用して、クラス名を取得する。
