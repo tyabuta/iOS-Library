@@ -13,6 +13,11 @@
 #define MINIMUM_TAPPABLE_SIZE 30
 
 
+
+
+#pragma mark -
+#pragma mark Macro functions
+
 /*
  * ネットワーク接続中のアイコン表示にする。
  * bVisible = true  接続中
@@ -20,34 +25,6 @@
  */
 static inline void networkActivityIndicator(BOOL bVisible){
     [UIApplication sharedApplication].networkActivityIndicatorVisible = bVisible;
-}
-
-
-/*
- * ビューのヘッダ部にUIToolbarを追加します。
- */
-static inline UIToolbar* toolbarAddToHeader(UIView* parentView){
-    float w = parentView.bounds.size.width;
-    CGRect rect = CGRectMake(0,0, w, TAPPABLE_SIZE);
-    UIToolbar* toolbar = [[UIToolbar alloc] initWithFrame:rect];
-    [parentView addSubview:toolbar];
-    return toolbar;
-}
-
-/*
- * ビューのヘッダ部にDoneボタンを持ったUIToolbarを追加します。
- */
-static inline UIToolbar* toolbarAddToHeaderWithDone(UIView* parentView, id target, SEL action){
-    UIToolbar* toolbar = toolbarAddToHeader(parentView);
-    
-    UIBarButtonItem* buttonItem =
-    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-                                                  target:target
-                                                  action:action];
-    NSArray* items = [NSArray arrayWithObjects:buttonItem, nil];
-    [toolbar setItems:items animated:YES];
-    
-    return toolbar;
 }
 
 /*
@@ -64,10 +41,27 @@ static void alertBox(NSString* msg){
     [alert show];
 }
 
+/*
+ * デバイス向きを考慮した、適切なスクリーンサイズを取得する。
+ * (ステータスバーの幅を引いた値)
+ */
+static inline CGSize
+UIInterfaceOrientationConsideredScreenSize(UIInterfaceOrientation interfaceOrientation){
+    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+    return UIInterfaceOrientationIsPortrait(interfaceOrientation)?
+    screenSize : CGSizeMake(screenSize.height, screenSize.width);
+}
 
+
+
+
+
+#pragma mark -
+#pragma mark WebViewController implementation
 
 @implementation WebViewController
 {
+    UIToolbar* _toolbar;
     UIWebView* _webView;
     NSURL*     _url;
 }
@@ -83,19 +77,42 @@ static void alertBox(NSString* msg){
     return self;
 }
 
+- (void)done:(id)sender
+{
+    [self dismissViewControllerAnimated:YES completion:NULL];
+}
+
+
+
+
+
+#pragma mark ViewController lifecycle
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
+    // 回転向きを考慮したスクリーンサイズを取得
+    CGSize screenSize = UIInterfaceOrientationConsideredScreenSize(self.interfaceOrientation);
+    float w = screenSize.width;
+    float h = screenSize.height;
+
     // Toolbar
-    toolbarAddToHeaderWithDone(self.view, _delegate, @selector(webViewControllerDidFinish:));
+    _toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0,0,
+                                                           screenSize.width,
+                                                           TAPPABLE_SIZE)];
+    [self.view addSubview:_toolbar];
+    UIBarButtonItem* buttonItem =
+    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                                  target:_delegate
+                                                  action:@selector(webViewControllerDidFinish:)];
+    NSArray* items = [NSArray arrayWithObjects:buttonItem, nil];
+    [_toolbar setItems:items animated:YES];
+
     
     // WebView
     NSURLRequest* request = [NSURLRequest requestWithURL:_url];
     
-    float w = self.view.bounds.size.width;
-    float h = self.view.bounds.size.height;
     _webView = [[UIWebView alloc]
                 initWithFrame: CGRectMake(0,TAPPABLE_SIZE,w,h - TAPPABLE_SIZE)];
     _webView.delegate = self;
@@ -105,13 +122,20 @@ static void alertBox(NSString* msg){
 }
 
 
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration{
+    [super willRotateToInterfaceOrientation:toInterfaceOrientation duration:duration];
 
+    // 回転向きを考慮したスクリーンサイズを取得
+    CGSize screenSize = UIInterfaceOrientationConsideredScreenSize(toInterfaceOrientation);
 
-
-- (void)done:(id)sender
-{
+    // ツールバーの配置
+    _toolbar.frame = CGRectMake(0, 0, screenSize.width, TAPPABLE_SIZE);
     
-    [self dismissViewControllerAnimated:YES completion:NULL];
+    // WebViewの配置
+    _webView.frame = CGRectMake(0,
+                                TAPPABLE_SIZE,
+                                screenSize.width,
+                                screenSize.height - TAPPABLE_SIZE);
 }
 
 - (void) viewWillDisappear:(BOOL)animated
@@ -121,24 +145,28 @@ static void alertBox(NSString* msg){
     [_webView stopLoading];
 }
 
-- (void)webViewDidStartLoad:(UIWebView*)wv
-{
-    networkActivityIndicator(YES);
-}
 
-- (void)webViewDidFinishLoad:(UIWebView*)wv
-{
-    networkActivityIndicator(NO);
-}
 
-- (void)webView:(UIWebView*)wv didFailLoadWithError:(NSError*)error
-{
+
+
+
+
+
+#pragma mark UIWebViewDelegate
+
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     networkActivityIndicator(NO);
     NSString* errorString = [error localizedDescription];
     //NSString* errorTitle = [NSString stringWithFormat:@"Error (%d)", error.code];
     alertBox(errorString);
 }
 
+- (void)webViewDidStartLoad:(UIWebView *)webView {
+    networkActivityIndicator(YES);
+}
 
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
+    networkActivityIndicator(NO);
+}
 
 @end
