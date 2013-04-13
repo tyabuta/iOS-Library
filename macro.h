@@ -947,7 +947,7 @@ static inline BOOL is_ipad(){
 }
 
 /*
- * カレントデバイスがiPadならYES
+ * カレントデバイスがiPhoneならYES
  */
 static inline BOOL is_iphone(){
     return (UIUserInterfaceIdiomPhone == [UIDevice currentDevice].userInterfaceIdiom);
