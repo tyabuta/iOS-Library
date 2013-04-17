@@ -1,5 +1,5 @@
 /*******************************************************************************
-  macro.h 1.6.0.13
+  macro.h 1.6.0.14
 
                               マクロ関数用のヘッダ
  
@@ -63,6 +63,25 @@
  -----------------------------------------------------------------------------*/
 #pragma mark -
 #pragma mark Application functions
+
+
+/*
+ * AppDelegateのインスタンスを取得する。
+ */
+static inline id <UIApplicationDelegate> UIAplicationDelegate() {
+    return [UIApplication sharedApplication].delegate;
+}
+
+/*
+ * デバイスの言語設定を取得する。
+ * 例) 日本->"ja" 英語->"en"
+ */
+static inline NSString* NSLocaleLanguage(){
+    NSArray* languages = [NSLocale preferredLanguages];
+    NSString*     lang = [languages objectAtIndex:0];
+    return lang;
+}
+
 
 /*
  * アプリケーション名を取得する。
@@ -1197,9 +1216,31 @@ static inline CGRect rectToFit(CGSize size, CGSize contentSize){
 }
 
 /*
+ * 「はい」か「いいえ」のアラートメッセージを表示する。
+ * 言語設定が日本語の場合は「はい」「いいえ」、その他の言語は「Yes」「No」となる。
+ *
+ * @delegate
+ * - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
+ */
+static inline void
+UIAlertViewShowConfirm(NSString* msg, id<UIAlertViewDelegate> delegate){
+    NSString* lang = NSLocaleLanguage();
+    BOOL     is_ja = [lang isEqualToString:@"ja"];
+    
+    NSString*    productName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+    UIAlertView* alert =
+    [[UIAlertView alloc] initWithTitle:productName
+                               message:msg
+                              delegate:delegate
+                     cancelButtonTitle:is_ja? @"いいえ": @"No"
+                     otherButtonTitles:is_ja? @"はい" : @"Yes", nil];
+    [alert show];
+}
+
+/*
  * 簡単なアラートメッセージを表示する。
  */
-static inline void alertBox(NSString* msg){
+static inline void UIAlertViewShowMessage(NSString* msg){
     NSString*    productName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
     UIAlertView* alert       = [[UIAlertView alloc]
                                 initWithTitle:productName
