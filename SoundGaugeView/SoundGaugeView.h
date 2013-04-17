@@ -1,5 +1,5 @@
 //
-//  SoundGaugeView.h
+//  SoundGaugeView
 //
 //  Created by tyabuta on 2013/04/12.
 //  Copyright (c) 2013 tyabuta. All rights reserved.
