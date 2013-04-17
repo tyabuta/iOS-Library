@@ -43,12 +43,12 @@
 /*
  * タップできる理想のUIサイズ
  */
-#define TAPPABLE_SIZE 44
+#define TAPPABLE_SIZE 44.0f
 
 /*
  * 縦または横のサイズが44ptを確保できない場合に、一方を最小30ptで適用。
  */
-#define MINIMUM_TAPPABLE_SIZE 30
+#define MINIMUM_TAPPABLE_SIZE 30.0f
 
 /*
  * システムボリュームの丁度一目盛り分の値
@@ -61,6 +61,7 @@
 /*------------------------------------------------------------------------------
                            Application functions
  -----------------------------------------------------------------------------*/
+#pragma mark -
 #pragma mark Application functions
 
 /*
@@ -184,6 +185,7 @@ rootViewControllerSetup(UIResponder<UIApplicationDelegate>* appDelegate,
 /*------------------------------------------------------------------------------
                              File IO functions
  -----------------------------------------------------------------------------*/
+#pragma mark -
 #pragma mark  File IO functions
 
 
@@ -232,6 +234,7 @@ static inline NSString* getModulePath(){
 /*------------------------------------------------------------------------------
                            Network functions
  -----------------------------------------------------------------------------*/
+#pragma mark -
 #pragma mark  Network functions
 
 
@@ -303,6 +306,7 @@ static inline NSString* stringEncode(NSString* str){
 /*------------------------------------------------------------------------------
                               Chrono functions
  -----------------------------------------------------------------------------*/
+#pragma mark -
 #pragma mark  Chrono functions
 
 /*
@@ -351,7 +355,48 @@ static inline void scheduledTimer(double interval, id target, SEL action){
 /*------------------------------------------------------------------------------
                                View functions
  -----------------------------------------------------------------------------*/
+#pragma mark -
 #pragma mark View functions
+
+/*
+ * 指定のビューが中央にくるように配置した場合のframe値を返す。
+ */
+static inline CGRect UIViewCenterFrameInSuperview(UIView* view){
+    CGSize view_size      = view.bounds.size;
+    CGSize superview_size = view.superview.bounds.size;
+    float left            = (superview_size.width  - view_size.width )/2.0f;
+    float top             = (superview_size.height - view_size.height)/2.0f;
+    CGRect new_frame = view.frame;
+    new_frame.origin.x = left;
+    new_frame.origin.y = top;
+    return new_frame;
+}
+
+/*
+ * 指定ビューのsuperviewからみて、水平方向に中心に配置する。
+ * 指定ビューはsuperviewに追加されている必要があります。
+ */
+static inline void UIViewHorizontalCenterInSuperview(UIView* view){
+    float view_width      = view.bounds.size.width;
+    float superview_width = view.superview.bounds.size.width;
+    float left            = (superview_width - view_width) / 2;
+    CGRect new_frame = view.frame;
+    new_frame.origin.x = left;
+    view.frame = new_frame;
+}
+
+/*
+ * 指定ビューのsuperviewからみて、垂直方向に中心に配置する。
+ * 指定ビューはsuperviewに追加されている必要があります。
+ */
+static inline void UIViewVerticalCenterInSuperview(UIView* view){
+    float view_height      = view.bounds.size.height;
+    float superview_height = view.superview.bounds.size.height;
+    float top              = (superview_height - view_height) / 2;
+    CGRect new_frame = view.frame;
+    new_frame.origin.y = top;
+    view.frame = new_frame;
+}
 
 /*
  * ビューフレームのボトム値を設定する。
@@ -375,31 +420,7 @@ static inline void viewSetRight(UIView* view, float right){
     view.frame = frame;
 }
 
-/*
- * 指定ビューのsuperviewからみて、水平方向に中心に配置する。
- * 指定ビューはsuperviewに追加されている必要があります。
- */
-static inline void viewHorizontalCenter(UIView* view){
-    float view_width      = view.bounds.size.width;
-    float superview_width = view.superview.bounds.size.width;
-    float left            = (superview_width - view_width) / 2;
-    CGRect new_frame = view.frame;
-    new_frame.origin.x = left;
-    view.frame = new_frame;
-}
 
-/*
- * 指定ビューのsuperviewからみて、垂直方向に中心に配置する。
- * 指定ビューはsuperviewに追加されている必要があります。
- */
-static inline void viewVerticalCenter(UIView* view){
-    float view_height      = view.bounds.size.height;
-    float superview_height = view.superview.bounds.size.height;
-    float top              = (superview_height - view_height) / 2;
-    CGRect new_frame = view.frame;
-    new_frame.origin.y = top;
-    view.frame = new_frame;
-}
 
 /*
  * 簡易なUISliderをparentViewに追加する。
@@ -751,6 +772,7 @@ static inline UIPinchGestureRecognizer* pinchRecognizerAddToView(UIView* view, i
 /*------------------------------------------------------------------------------
  QuartzCore functions
  -----------------------------------------------------------------------------*/
+#pragma mark -
 #pragma mark QuartzCore functions
 
 /*
@@ -805,6 +827,7 @@ static inline void layerStyleRoundRectAndSmokeWhite(UIView* view){
 /*------------------------------------------------------------------------------
  CoreGraphics functions
  -----------------------------------------------------------------------------*/
+#pragma mark -
 #pragma mark CoreGraphics functions
 
 /*
@@ -919,6 +942,93 @@ static inline void CGContextDrawLinearGradientWithTwoColor
 
 
 
+/*------------------------------------------------------------------------------
+ MediaPlayer.framework functions
+ -----------------------------------------------------------------------------*/
+#pragma mark -
+#pragma mark  MediaPlayer.framework functions
+
+/*
+ * #import <MediaPlayer/MediaPlayer.h>
+ * MediaPlayer.frameworkが必要
+ */
+#ifdef MP_EXTERN_CLASS_AVAILABLE
+
+/*
+ * 今の音量を取得する。0-1
+ */
+static inline float MPMusicPlayerControllerGetVolume(){
+    MPMusicPlayerController* musicPlayer =
+    [MPMusicPlayerController applicationMusicPlayer];
+    return musicPlayer.volume;
+}
+
+/*
+ * 音量を設定する。0-1
+ */
+static inline void MPMusicPlayerControllerSetVolume(float volume){
+    MPMusicPlayerController* musicPlayer =
+    [MPMusicPlayerController applicationMusicPlayer];
+    musicPlayer.volume = volume;
+}
+
+/*
+ * 今の音量から増減量を指定する。0-1
+ */
+static inline void MPMusicPlayerControllerAddVolume(float addVolume){
+    MPMusicPlayerController* musicPlayer =
+    [MPMusicPlayerController applicationMusicPlayer];
+    musicPlayer.volume += addVolume;
+}
+
+
+
+/*
+ * システムボリュームの変更通知のオブザーバとセレクタを登録する。
+ * - (void)func:(NSNotification *)notification
+ *
+ * notification.name プロパティでどの通知が発生したのかがわかる。
+ * MPMusicPlayerControllerVolumeDidChangeNotification
+ *
+ * 通知の必要がなくなったら、NSNotificationCenterRemoveObserver関数で
+ * オブサーバー登録を抹消しましょう。
+ *
+ * 通知発行も必要ないなら、
+ * MPMusicPlayerControllerGeneratingPlaybackNotifications関数で通知発行を停止しましょう。
+ */
+static inline void
+MPMusicPlayerControllerRegisterVolumeDidChangeNotification(id observer, SEL selector){
+    
+    // 通知センターへ登録
+    NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
+    [center addObserver:observer
+               selector:selector
+                   name:MPMusicPlayerControllerVolumeDidChangeNotification
+                 object:nil];
+    
+    // 通知発行を有効にする。
+    MPMusicPlayerControllerGeneratingPlaybackNotifications(YES);
+}
+
+/*
+ * MusicPlayerの通知発行を有効にする。
+ * 通知の必要がなくなったら、無効にしましょう。
+ * bBegin: YES->有効 NO->無効
+ */
+static inline void
+MPMusicPlayerControllerGeneratingPlaybackNotifications(BOOL bBegin){
+    MPMusicPlayerController* musicPlayer = [MPMusicPlayerController applicationMusicPlayer];
+    if (bBegin){
+        [musicPlayer beginGeneratingPlaybackNotifications];
+    }
+    else {
+        [musicPlayer endGeneratingPlaybackNotifications];
+    }
+}
+
+#endif // MP_EXTERN_CLASS_AVAILABLE
+
+
 
 
 
@@ -926,7 +1036,36 @@ static inline void CGContextDrawLinearGradientWithTwoColor
 /*------------------------------------------------------------------------------
                               Other functions
  -----------------------------------------------------------------------------*/
+#pragma mark -
 #pragma mark Other functions
+
+
+/*
+ * CGFloat同士がイコールか比較を行う。
+ * kVerySmallValue:  最小精度を指定する。
+ * 例）0.01f -> 0.01fより差があれば同じとは判断しない。
+ */
+static inline BOOL
+CGFloatIsEqual(CGFloat f1, CGFloat f2, CGFloat kVerySmallValue){
+    return !(fabsf(f1 - f2) > kVerySmallValue);
+}
+
+/*
+ * 指定イメージから切り抜いたUIImageを取得する。
+ */
+static inline UIImage*
+UIImageCreateWithImageInRect(UIImage* sourceImage, CGRect inRect){
+    UIImage*       image = nil;
+    CGImageRef image_ref =
+    CGImageCreateWithImageInRect(sourceImage.CGImage, inRect);
+    
+    image = [UIImage imageWithCGImage:image_ref
+                                scale:1.0f
+                          orientation:UIImageOrientationUp];
+    
+    CGImageRelease(image_ref);
+    return image;
+}
 
 /*
  * デバイス向きを考慮した、適切なスクリーンサイズを取得する。
@@ -1146,9 +1285,9 @@ static inline void registerBatteryNotificationObserver(id observer, SEL selector
 
 /*
  * 通知センターに登録したオブザーバを削除する。
- * オブザーバに登録したクラスはdealloc メソッドで削除しておく事をおすすめする。
+ * オブザーバに登録したクラスはdealloc メソッドで削除しておく。
  */
-static inline void removeObserverOfNotificationCenter(id observer){
+static inline void NSNotificationCenterRemoveObserver(id observer){
     [[NSNotificationCenter defaultCenter] removeObserver:observer];
 }
 
@@ -1192,42 +1331,6 @@ static inline void tweetComposeShow(NSString* initialTweet, UIImage* image, UIVi
 
 
 
-
-/*
- * #import <MediaPlayer/MediaPlayer.h>
- * MediaPlayer.frameworkが必要
- */
-#ifdef MP_EXTERN_CLASS_AVAILABLE
-
-/*
- * 音量を設定する。0-1
- */
-static inline void systemSetVolume(float volume){
-    MPMusicPlayerController* musicPlayer =
-    [MPMusicPlayerController applicationMusicPlayer];
-    musicPlayer.volume = volume;
-}
-
-/*
- * 今の音量を取得する。0-1
- */
-static inline float systemGetVolume(){
-    MPMusicPlayerController* musicPlayer =
-    [MPMusicPlayerController applicationMusicPlayer];
-    return musicPlayer.volume;
-}
-
-/*
- * 今の音量から増減量を指定する。0-1
- */
-static inline void systemAddVolume(float addVolume){
-    MPMusicPlayerController* musicPlayer =
-    [MPMusicPlayerController applicationMusicPlayer];
-    musicPlayer.volume += addVolume;
-}
-
-
-#endif // MP_EXTERN_CLASS_AVAILABLE
 
 
 
