@@ -1,5 +1,5 @@
 /*******************************************************************************
-  macro.h 1.6.1.15
+  macro.h 1.6.2.16
 
                               マクロ関数用のヘッダ
  
@@ -39,6 +39,10 @@
 #define dmsg(...)
 #endif
 
+/*
+ * 配列個数の取得
+ */
+#define countof(arr) (sizeof(arr)/sizeof(arr[0]))
 
 /*
  * タップできる理想のUIサイズ
@@ -850,27 +854,36 @@ NS_INLINE void layerStyleRoundRectAndSmokeWhite(UIView* view){
 #pragma mark CoreGraphics functions
 
 /*
- * 角丸四角形を描画する
+ * CGPoint配列全ての要素に指定の倍数を掛ける。
  */
 NS_INLINE void
-drawRoundRect(CGContextRef context, CGRect rect, CGFloat radius, CGColorRef color){
-    
-    CGContextSetFillColorWithColor(context, color);
-    
-    float left  = rect.origin.x;
-    float top   = rect.origin.y;
-    float right = left + rect.size.width;
-    float bottom= top  + rect.size.height;
-    
-    CGContextMoveToPoint(context, left, top + (rect.size.height/2));
-    CGContextAddArcToPoint(context,  left,    top, right,    top, radius);
-    CGContextAddArcToPoint(context, right,    top, right, bottom, radius);
-    CGContextAddArcToPoint(context, right, bottom,  left, bottom, radius);
-    CGContextAddArcToPoint(context,  left, bottom,  left,    top, radius);
-    CGContextClosePath(context);
-    CGContextFillPath(context);
+CGPointArrayTranslate(CGPoint points[], size_t count, CGFloat vx, CGFloat vy){
+    for (int i=0; i<count; i++){
+        points[i].x *= vx;
+        points[i].y *= vy;
+    }
 }
 
+/*
+ * CGPoint配列全ての要素に指定のオフセット値を加算する。
+ */
+NS_INLINE void
+CGPointArrayOffset(CGPoint points[], size_t count, CGFloat dx, CGFloat dy){
+    for (int i=0; i<count; i++){
+        points[i].x += dx;
+        points[i].y += dy;
+    }
+}
+
+
+NS_INLINE void CGContextBegin(CGContextRef context) {
+    CGContextSaveGState(context);
+    CGContextSetShouldAntialias(context, YES);
+}
+
+NS_INLINE void CGContextEnd(CGContextRef context) {
+    CGContextRestoreGState(context);
+}
 
 /*
  * コンテキストに角丸矩形のPathを追加する。
@@ -889,6 +902,7 @@ CGContextAddRoundRect(CGContextRef context, CGRect rect, CGFloat radius){
     CGContextAddArcToPoint(context,  left, bottom,  left,    top, radius);
     CGContextClosePath(context);
 }
+
 
 /*
  * コンテキストに角丸矩形のPathを追加する。
@@ -930,6 +944,16 @@ CGContextAddRoundRectByRoundingCorners
                            radius : 0.0f);
     
     CGContextClosePath(context);
+}
+
+
+/*
+ * 角丸四角形を描画する
+ */
+NS_INLINE void
+CGContextFillRoundRect(CGContextRef context, CGRect rect, CGFloat radius){
+    CGContextAddRoundRect(context, rect, radius);
+    CGContextFillPath(context);
 }
 
 /*
@@ -1100,14 +1124,14 @@ UIInterfaceOrientationConsideredScreenSize(UIInterfaceOrientation interfaceOrien
 /*
  * カレントデバイスがiPadならYES
  */
-NS_INLINE BOOL is_ipad(){
+NS_INLINE BOOL UIDeviceIsPad(){
     return (UIUserInterfaceIdiomPad == [UIDevice currentDevice].userInterfaceIdiom);
 }
 
 /*
  * カレントデバイスがiPhoneならYES
  */
-NS_INLINE BOOL is_iphone(){
+NS_INLINE BOOL UIDeviceIsPhone(){
     return (UIUserInterfaceIdiomPhone == [UIDevice currentDevice].userInterfaceIdiom);
 }
 
@@ -1154,14 +1178,14 @@ NS_INLINE CGPoint getTouchPoint(NSSet* touches, UIView* view){
 /*
  * 半透明の黒色
  */
-NS_INLINE UIColor* clearBlack(){
+NS_INLINE UIColor* UIColorClearBlack(){
     return [UIColor colorWithWhite:0.0f alpha:0.5f];
 }
 
 /*
  * 半透明の白色
  */
-NS_INLINE UIColor* clearWhite(){
+NS_INLINE UIColor* UIColorClearWhite(){
     return [UIColor colorWithWhite:1.0f alpha:0.3f];
 }
 
@@ -1227,9 +1251,8 @@ UIAlertViewShowConfirm(NSString* msg, id<UIAlertViewDelegate> delegate){
     NSString* lang = NSLocaleLanguage();
     BOOL     is_ja = [lang isEqualToString:@"ja"];
     
-    NSString*    productName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
     UIAlertView* alert =
-    [[UIAlertView alloc] initWithTitle:productName
+    [[UIAlertView alloc] initWithTitle:@""
                                message:msg
                               delegate:delegate
                      cancelButtonTitle:is_ja? @"いいえ": @"No"
@@ -1241,9 +1264,8 @@ UIAlertViewShowConfirm(NSString* msg, id<UIAlertViewDelegate> delegate){
  * 簡単なアラートメッセージを表示する。
  */
 NS_INLINE void UIAlertViewShowMessage(NSString* msg){
-    NSString*    productName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
     UIAlertView* alert       = [[UIAlertView alloc]
-                                initWithTitle:productName
+                                initWithTitle:@""
                                 message:msg
                                 delegate:nil
                                 cancelButtonTitle:nil
@@ -1254,14 +1276,19 @@ NS_INLINE void UIAlertViewShowMessage(NSString* msg){
 
 
 /*
- * バッテリステートを文字列で取得します。
+ * バッテリステートを取得します。
  * 関数内でbatteryMonitoringEnabledをYESに設定します。
  */
-NS_INLINE NSString* getBatteryState(){
+NS_INLINE UIDeviceBatteryState UIDeviceBatteryGetState(){
     UIDevice* device = [UIDevice currentDevice];
     device.batteryMonitoringEnabled = YES;
-    UIDeviceBatteryState state = device.batteryState;
-    
+    return device.batteryState;
+}
+
+/*
+ * UIDeviceBatteryState定数から、文字列に変換します。
+ */
+NS_INLINE NSString* UIDeviceBatteryStateToString(UIDeviceBatteryState state){
     NSString* stateText = nil;
     switch (state) {
         case UIDeviceBatteryStateCharging:
@@ -1276,29 +1303,18 @@ NS_INLINE NSString* getBatteryState(){
         default:
             stateText = @"Unknown";
     }
-    
     return stateText;
 }
-
+    
 /*
- * バッテリレベルを文字列で取得します。
+ * バッテリレベルを取得します。
  * 関数内でbatteryMonitoringEnabledをYESに設定します。
  */
-NS_INLINE NSString* getBatteryLevel(){
+NS_INLINE float UIDeviceBatteryGetLevel(){
     UIDevice* device = [UIDevice currentDevice];
     device.batteryMonitoringEnabled = YES;
-    float batteryLevel = device.batteryLevel;
-    
-    NSString* levelText = nil;
-    if (0.0f > batteryLevel){
-        levelText = @"---%";
-    }
-    else {
-        levelText = [NSString stringWithFormat:@"%d%%", (int)(batteryLevel*100)];
-    }
-    return levelText;
+    return device.batteryLevel;
 }
-
 
 /*
  * バッテリ状態通知のオブザーバを登録する。
@@ -1310,7 +1326,9 @@ NS_INLINE NSString* getBatteryLevel(){
  * UIDeviceBatteryLevelDidChangeNotification
  * UIDeviceBatteryStateDidChangeNotification
  */
-NS_INLINE void registerBatteryNotificationObserver(id observer, SEL selector){
+NS_INLINE void
+UIDeviceBatteryRegisterStateAndLevelDidChangeNotification(id  observer,
+                                                          SEL selector){
     UIDevice* device = [UIDevice currentDevice];
     device.batteryMonitoringEnabled = YES;
     
