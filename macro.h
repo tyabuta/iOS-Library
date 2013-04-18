@@ -1,5 +1,5 @@
 /*******************************************************************************
-  macro.h 1.6.0.14
+  macro.h 1.6.1.15
 
                               マクロ関数用のヘッダ
  
@@ -68,7 +68,7 @@
 /*
  * AppDelegateのインスタンスを取得する。
  */
-static inline id <UIApplicationDelegate> UIAplicationDelegate() {
+NS_INLINE id <UIApplicationDelegate> UIAplicationDelegate() {
     return [UIApplication sharedApplication].delegate;
 }
 
@@ -76,7 +76,7 @@ static inline id <UIApplicationDelegate> UIAplicationDelegate() {
  * デバイスの言語設定を取得する。
  * 例) 日本->"ja" 英語->"en"
  */
-static inline NSString* NSLocaleLanguage(){
+NS_INLINE NSString* NSLocaleLanguage(){
     NSArray* languages = [NSLocale preferredLanguages];
     NSString*     lang = [languages objectAtIndex:0];
     return lang;
@@ -86,14 +86,14 @@ static inline NSString* NSLocaleLanguage(){
 /*
  * アプリケーション名を取得する。
  */
-static inline NSString* getAppName(){
+NS_INLINE NSString* getAppName(){
     return [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
 }
 
 /*
  * UserDefaultsの全ての値を取得する。
  */
-static inline NSString* dumpAllDefaults(){
+NS_INLINE NSString* dumpAllDefaults(){
     NSDictionary* dic = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
     return [NSString stringWithFormat:@"defualts:%@", dic];
 }
@@ -101,7 +101,7 @@ static inline NSString* dumpAllDefaults(){
 /*
  * UserDefaultsのアプリケーション固有の値を取得する。
  */
-static inline NSString* dumpAppDefaults(){
+NS_INLINE NSString* dumpAppDefaults(){
     NSString*      appDomain = [[NSBundle mainBundle] bundleIdentifier];
     NSDictionary*  dic       = [[NSUserDefaults standardUserDefaults] persistentDomainForName:appDomain];
     return [NSString stringWithFormat:@"defualts:%@", dic];
@@ -111,7 +111,7 @@ static inline NSString* dumpAppDefaults(){
 /*
  * UserDefaultsに文字列を保存する。
  */
-static inline void setDefaultString(NSString* str, NSString* forKey){
+NS_INLINE void setDefaultString(NSString* str, NSString* forKey){
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setValue:str forKey:forKey];
     [userDefaults synchronize];
@@ -120,7 +120,7 @@ static inline void setDefaultString(NSString* str, NSString* forKey){
 /*
  * UserDefaultsに数値を保存する。
  */
-static inline void setDefaultInteger(NSInteger intValue, NSString* forKey){
+NS_INLINE void setDefaultInteger(NSInteger intValue, NSString* forKey){
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setInteger:intValue forKey:forKey];
     [userDefaults synchronize];
@@ -129,7 +129,7 @@ static inline void setDefaultInteger(NSInteger intValue, NSString* forKey){
 /*
  * UserDefaultsに小数値を保存する。
  */
-static inline void setDefaultFloat(float floatValue, NSString* forKey){
+NS_INLINE void setDefaultFloat(float floatValue, NSString* forKey){
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setFloat:floatValue forKey:forKey];
     [userDefaults synchronize];
@@ -138,7 +138,7 @@ static inline void setDefaultFloat(float floatValue, NSString* forKey){
 /*
  * UserDefaultsに小数値を保存する。
  */
-static inline void removeDefaultKey(float floatValue, NSString* forKey){
+NS_INLINE void removeDefaultKey(float floatValue, NSString* forKey){
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults removeObjectForKey:forKey];
     [userDefaults synchronize];
@@ -147,21 +147,21 @@ static inline void removeDefaultKey(float floatValue, NSString* forKey){
 /*
  * UserDefaultsから文字列を取得する。
  */
-static inline NSString* getDefaultString(NSString* key){
+NS_INLINE NSString* getDefaultString(NSString* key){
     return [[NSUserDefaults standardUserDefaults] stringForKey:key];
 }
 
 /*
  * UserDefaultsから数値を取得する。
  */
-static inline NSInteger getDefaultInteger(NSString* key){
+NS_INLINE NSInteger getDefaultInteger(NSString* key){
     return [[NSUserDefaults standardUserDefaults] integerForKey:key];
 }
 
 /*
  * UserDefaultsから数値を取得する。
  */
-static inline float getDefaultFloat(NSString* key){
+NS_INLINE float getDefaultFloat(NSString* key){
     return [[NSUserDefaults standardUserDefaults] floatForKey:key];
 }
 
@@ -169,7 +169,7 @@ static inline float getDefaultFloat(NSString* key){
 /*
  * ステータスバーの非表示にする。
  */
-static inline void statusBarHidden(BOOL bHidden){
+NS_INLINE void statusBarHidden(BOOL bHidden){
     [UIApplication sharedApplication].statusBarHidden = bHidden;
 }
 
@@ -178,7 +178,7 @@ static inline void statusBarHidden(BOOL bHidden){
  * bVisible = true  接続中
  *            false 何も表示しない。
  */
-static inline void networkActivityIndicator(BOOL bVisible){
+NS_INLINE void networkActivityIndicator(BOOL bVisible){
     [UIApplication sharedApplication].networkActivityIndicatorVisible = bVisible;
 }
 
@@ -189,7 +189,7 @@ static inline void networkActivityIndicator(BOOL bVisible){
  * 下記ハンドラで使用する
  * - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
  */
-static inline BOOL
+NS_INLINE BOOL
 rootViewControllerSetup(UIResponder<UIApplicationDelegate>* appDelegate,
                         UIViewController*                   viewController){
     
@@ -229,21 +229,21 @@ static NSArray* getFilePathsFromResource(NSString* dir){
 /*
  * PATHをスラッシュでつなげる。
  */
-static inline NSString* joinPath(NSString* dir, NSString* file){
+NS_INLINE NSString* joinPath(NSString* dir, NSString* file){
     return [NSString stringWithFormat:@"%@/%@", dir, file];
 }
 
 /*
  * PATHからファイル名のみ取り出す。
  */
-static inline NSString* getFileNameFromPath(NSString* path){
+NS_INLINE NSString* getFileNameFromPath(NSString* path){
     return [path lastPathComponent];
 }
 
 /*
  * モジュールディレクトリを取得する。
  */
-static inline NSString* getModulePath(){
+NS_INLINE NSString* getModulePath(){
     return [[NSBundle mainBundle] resourcePath];
 }
 
@@ -260,7 +260,7 @@ static inline NSString* getModulePath(){
 /*
  * 指定のURLをリクエストし、NSDataオブジェクトを取得する。
  */
-static inline NSData* dataRequestWithURL(NSString* urlString){
+NS_INLINE NSData* dataRequestWithURL(NSString* urlString){
     // URL
     NSURL* url = [NSURL URLWithString:urlString];
     
@@ -279,7 +279,7 @@ static inline NSData* dataRequestWithURL(NSString* urlString){
  * 指定のURLでリクエストする。
  * 取得した内容は文字列として返す。
  */
-static inline NSString* stringRequestWithURL(NSString* urlString){
+NS_INLINE NSString* stringRequestWithURL(NSString* urlString){
     NSData* data = dataRequestWithURL(urlString);
     
     // To string
@@ -293,7 +293,7 @@ static inline NSString* stringRequestWithURL(NSString* urlString){
  * 指定のURLでリクエストする。
  * 取得した内容はディクショナリとして返す。
  */
-static inline NSDictionary* jsonRequestWithURL(NSString* urlString){
+NS_INLINE NSDictionary* jsonRequestWithURL(NSString* urlString){
     NSData*   data = dataRequestWithURL(urlString);
     NSError* error = nil;
     
@@ -307,7 +307,7 @@ static inline NSDictionary* jsonRequestWithURL(NSString* urlString){
 /*
  * URLエンコードする
  */
-static inline NSString* stringEncode(NSString* str){
+NS_INLINE NSString* stringEncode(NSString* str){
     CFStringRef encodedString =
     CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
                                             (CFStringRef)str,
@@ -331,7 +331,7 @@ static inline NSString* stringEncode(NSString* str){
 /*
  * 日付をYYYYMMDD形式の文字列に変換する。
  */
-static inline NSString* dateFormatToYYYYMMDD(NSDate* date){
+NS_INLINE NSString* dateFormatToYYYYMMDD(NSDate* date){
     NSDateFormatter* formatter = [[NSDateFormatter alloc] init];
     formatter.dateFormat = @"YYYYMMdd";
     return [formatter stringFromDate:date];
@@ -341,7 +341,7 @@ static inline NSString* dateFormatToYYYYMMDD(NSDate* date){
 /*
  * 日付をHH:mm形式の文字列に変換する。
  */
-static inline NSString* dateFormatToHHmm(NSDate* date){
+NS_INLINE NSString* dateFormatToHHmm(NSDate* date){
     NSDateFormatter* formatter = [[NSDateFormatter alloc] init];
     formatter.dateFormat = @"HH:mm";
     return [formatter stringFromDate:date];
@@ -351,7 +351,7 @@ static inline NSString* dateFormatToHHmm(NSDate* date){
 /*
  * 現在の時間[sec]をmicrosecondの精度で取得する。
  */
-static inline double gettime(){
+NS_INLINE double gettime(){
     struct timeval t;
     gettimeofday(&t, NULL);
     return t.tv_sec + (t.tv_usec * 1e-6);
@@ -361,7 +361,7 @@ static inline double gettime(){
  * 繰り返しタイマーをセットする。
  * - (void)tick:(NSTimer*)sender
  */
-static inline void scheduledTimer(double interval, id target, SEL action){
+NS_INLINE void scheduledTimer(double interval, id target, SEL action){
     [NSTimer scheduledTimerWithTimeInterval:interval
                                      target:target
                                    selector:action
@@ -380,7 +380,7 @@ static inline void scheduledTimer(double interval, id target, SEL action){
 /*
  * 指定のビューが中央にくるように配置した場合のframe値を返す。
  */
-static inline CGRect UIViewCenterFrameInSuperview(UIView* view){
+NS_INLINE CGRect UIViewCenterFrameInSuperview(UIView* view){
     CGSize view_size      = view.bounds.size;
     CGSize superview_size = view.superview.bounds.size;
     float left            = (superview_size.width  - view_size.width )/2.0f;
@@ -395,7 +395,7 @@ static inline CGRect UIViewCenterFrameInSuperview(UIView* view){
  * 指定ビューのsuperviewからみて、水平方向に中心に配置する。
  * 指定ビューはsuperviewに追加されている必要があります。
  */
-static inline void UIViewHorizontalCenterInSuperview(UIView* view){
+NS_INLINE void UIViewHorizontalCenterInSuperview(UIView* view){
     float view_width      = view.bounds.size.width;
     float superview_width = view.superview.bounds.size.width;
     float left            = (superview_width - view_width) / 2;
@@ -408,7 +408,7 @@ static inline void UIViewHorizontalCenterInSuperview(UIView* view){
  * 指定ビューのsuperviewからみて、垂直方向に中心に配置する。
  * 指定ビューはsuperviewに追加されている必要があります。
  */
-static inline void UIViewVerticalCenterInSuperview(UIView* view){
+NS_INLINE void UIViewVerticalCenterInSuperview(UIView* view){
     float view_height      = view.bounds.size.height;
     float superview_height = view.superview.bounds.size.height;
     float top              = (superview_height - view_height) / 2;
@@ -421,7 +421,7 @@ static inline void UIViewVerticalCenterInSuperview(UIView* view){
  * ビューフレームのボトム値を設定する。
  * 指定ビューはsuperviewに追加されている必要があります。
  */
-static inline void viewSetBottom(UIView* view, float bottom){
+NS_INLINE void viewSetBottom(UIView* view, float bottom){
     CGRect frame = view.frame;
     frame.origin.y =
     view.superview.bounds.size.height - frame.size.height - bottom;
@@ -432,7 +432,7 @@ static inline void viewSetBottom(UIView* view, float bottom){
  * ビューフレームのRight値を設定する。
  * 指定ビューはsuperviewに追加されている必要があります。
  */
-static inline void viewSetRight(UIView* view, float right){
+NS_INLINE void viewSetRight(UIView* view, float right){
     CGRect frame = view.frame;
     frame.origin.x =
     view.superview.bounds.size.width - frame.size.width - right;
@@ -446,7 +446,7 @@ static inline void viewSetRight(UIView* view, float right){
  * イベントも追加する。
  * - (void)sliderValueChanged:(UISlider*)sender
  */
-static inline UISlider*
+NS_INLINE UISlider*
 sliderAddBasic(CGRect frame, UIView* parentView, id target, SEL action){
     UISlider* slider = [[UISlider alloc] initWithFrame:frame];
     [slider addTarget:target
@@ -459,7 +459,7 @@ sliderAddBasic(CGRect frame, UIView* parentView, id target, SEL action){
 /*
  * ビューコントローラを登場させる。
  */
-static inline void
+NS_INLINE void
 presentViewController(UIViewController* currentViewController,
                       UIViewController* newViewController)
 {
@@ -471,7 +471,7 @@ presentViewController(UIViewController* currentViewController,
 /*
  * ビューコントローラをどける。
  */
-static inline void dismissViewController(UIViewController* viewController){
+NS_INLINE void dismissViewController(UIViewController* viewController){
     [viewController dismissViewControllerAnimated:YES completion:NULL];
 }
 
@@ -479,7 +479,7 @@ static inline void dismissViewController(UIViewController* viewController){
 /*
  * ビューのヘッダ部にUIToolbarを追加します。
  */
-static inline UIToolbar* toolbarAddToHeader(UIView* parentView){
+NS_INLINE UIToolbar* toolbarAddToHeader(UIView* parentView){
     float w = parentView.bounds.size.width;
     CGRect rect = CGRectMake(0,0, w, TAPPABLE_SIZE);
     UIToolbar* toolbar = [[UIToolbar alloc] initWithFrame:rect];
@@ -490,7 +490,7 @@ static inline UIToolbar* toolbarAddToHeader(UIView* parentView){
 /*
  * ビューのヘッダ部にDoneボタンを持ったUIToolbarを追加します。
  */
-static inline UIToolbar* toolbarAddToHeaderWithDone(UIView* parentView, id target, SEL action){
+NS_INLINE UIToolbar* toolbarAddToHeaderWithDone(UIView* parentView, id target, SEL action){
     UIToolbar* toolbar = toolbarAddToHeader(parentView);
     
     UIBarButtonItem* buttonItem =
@@ -517,7 +517,7 @@ static inline UIToolbar* toolbarAddToHeaderWithDone(UIView* parentView, id targe
  * - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
  *
  */
-static inline void imagePickerShow(UIViewController<UINavigationControllerDelegate, UIImagePickerControllerDelegate>* viewController){
+NS_INLINE void imagePickerShow(UIViewController<UINavigationControllerDelegate, UIImagePickerControllerDelegate>* viewController){
     UIImagePickerController* picker = [[UIImagePickerController alloc] init];
     picker.delegate = viewController;
     picker.allowsEditing = YES;
@@ -527,7 +527,7 @@ static inline void imagePickerShow(UIViewController<UINavigationControllerDelega
 /*
  * イメージピッカーが選択したUIImageを取得し、ピッカー表示を消す。
  */
-static inline UIImage* imagePickerGetPickedImageAndHide(UIImagePickerController* picker, NSDictionary* info){
+NS_INLINE UIImage* imagePickerGetPickedImageAndHide(UIImagePickerController* picker, NSDictionary* info){
     UIImage* image = [info objectForKey:UIImagePickerControllerEditedImage];
     [picker dismissViewControllerAnimated:YES completion:NULL];
     return image;
@@ -536,14 +536,14 @@ static inline UIImage* imagePickerGetPickedImageAndHide(UIImagePickerController*
 /*
  * イメージピッカーの表示を消す。
  */
-static inline void imagePickerHide(UIImagePickerController* picker){
+NS_INLINE void imagePickerHide(UIImagePickerController* picker){
     [picker dismissViewControllerAnimated:YES completion:NULL];
 }
 
 /*
  * UIViewControllerの親子関係を作る。
  */
-static inline void
+NS_INLINE void
 addChildViewController(UIViewController* child, UIViewController* toParent){
     [toParent addChildViewController:child];
     [toParent.view addSubview:child.view];
@@ -553,7 +553,7 @@ addChildViewController(UIViewController* child, UIViewController* toParent){
 /*
  * ビューのスケールを設定する。
  */
-static inline void viewSetScale(UIView* view, CGFloat scale){
+NS_INLINE void viewSetScale(UIView* view, CGFloat scale){
     view.transform = CGAffineTransformMakeScale(scale, scale);
 }
 
@@ -587,7 +587,7 @@ static NSString* _dumpSubview(UIView* view, int indent){
 /*
  * UIViewのSubViewを階層表示した文字列を返す。
  */
-static inline NSString* dumpSubview(UIView* view){
+NS_INLINE NSString* dumpSubview(UIView* view){
     return _dumpSubview(view, 0);
 }
 
@@ -595,7 +595,7 @@ static inline NSString* dumpSubview(UIView* view){
  * UIImageのinitWithContentsOfFileメソッドで読み込んだイメージは描画時にデコード処理が入るようになる為、
  * 描画速度が遅くなる。この関数で読み込めばその問題が解消できる。
  */
-static inline UIImage*
+NS_INLINE UIImage*
 imageImmediateLoadWithContentsOfFile(NSString* path){
     UIImage *image = [[UIImage alloc] initWithContentsOfFile:path];
     CGImageRef imageRef = [image CGImage];
@@ -621,7 +621,7 @@ imageImmediateLoadWithContentsOfFile(NSString* path){
  * UIImageからUIImageViewを作成し、parentViewに追加する。 サイズはフィットするように配置される。
  * 成功時には作成したUIImageViewのオブジェクトが返る。
  */
-static inline UIImageView*
+NS_INLINE UIImageView*
 imageViewAddToParent(UIImage* image, UIView* parentView){
     UIImageView* imageView = [[UIImageView alloc] initWithImage:image];
     // アスペクト比が崩れないように親ビューにフィットさせる。
@@ -636,7 +636,7 @@ imageViewAddToParent(UIImage* image, UIView* parentView){
  * UIImageViewをparentViewに追加する。 サイズはフィットするように配置される。
  * 成功時には作成したUIImageViewのオブジェクトが返る。
  */
-static inline UIImageView*
+NS_INLINE UIImageView*
 imageAddBasicFromResource(NSString* imageName, UIView* parentView){
     UIImage* image = [UIImage imageNamed:imageName];
     if (nil == image) {
@@ -650,7 +650,7 @@ imageAddBasicFromResource(NSString* imageName, UIView* parentView){
  * UIImageViewをparentViewに追加する。 サイズはフィットするように配置される。
  * 成功時には作成したUIImageViewのオブジェクトが返る。
  */
-static inline UIImageView*
+NS_INLINE UIImageView*
 imageAddBasicFromPath(NSString* imagePath, UIView* parentView){
     UIImage* image = imageImmediateLoadWithContentsOfFile(imagePath);
     if (nil == image) {
@@ -667,7 +667,7 @@ imageAddBasicFromPath(NSString* imagePath, UIView* parentView){
  * デリゲート例)
  * - (void)buttonTaped:(UIButton*)sender
  */
-static inline UIButton*
+NS_INLINE UIButton*
 buttonAddBasic(NSString* title, CGRect frame, UIView* parentView, id target, SEL action){
     UIButton* button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [button setTitle:title forState:UIControlStateNormal];
@@ -681,7 +681,7 @@ buttonAddBasic(NSString* title, CGRect frame, UIView* parentView, id target, SEL
 /*
  * リソース画像からCustomButtonをparentViewに追加する。
  */
-static inline UIButton*
+NS_INLINE UIButton*
 buttonAddCustum(NSString* imageNameForNormal, NSString* imageNameForHighlighted,
                 CGRect frame, UIView* parentView, id target, SEL action){
     
@@ -780,7 +780,7 @@ static UITextField* textFieldAddBasic(CGRect frame, CGFloat fontSize, UIView* pa
  * ピンチジェスチャーを追加する。
  * - (void)viewPinched:(UIPinchGestureRecognizer*)recognizer
  */
-static inline UIPinchGestureRecognizer* pinchRecognizerAddToView(UIView* view, id target, SEL action){
+NS_INLINE UIPinchGestureRecognizer* pinchRecognizerAddToView(UIView* view, id target, SEL action){
     UIPinchGestureRecognizer* recognizer = [[UIPinchGestureRecognizer alloc] init];
     [recognizer addTarget:target action:action];
     [view addGestureRecognizer:recognizer];
@@ -802,7 +802,7 @@ static inline UIPinchGestureRecognizer* pinchRecognizerAddToView(UIView* view, i
 /*
  * ビューの影を設定する。
  */
-static inline void layerStyleShadow(UIView* view){
+NS_INLINE void layerStyleShadow(UIView* view){
     view.layer.shadowOffset  = CGSizeMake(3.0f, 3.0f);
     view.layer.shadowOpacity = 0.7f;
 }
@@ -810,7 +810,7 @@ static inline void layerStyleShadow(UIView* view){
 /*
  * ビューの影と枠を設定する。
  */
-static inline void layerStyleShadowAndBorder(UIView* view){
+NS_INLINE void layerStyleShadowAndBorder(UIView* view){
     layerStyleShadow(view);
     view.layer.borderWidth = 3.0f;
 }
@@ -818,7 +818,7 @@ static inline void layerStyleShadowAndBorder(UIView* view){
 /*
  * ビューのコーナに丸くマスクをかける。
  */
-static inline void layerStyleRoundRect(UIView* view){
+NS_INLINE void layerStyleRoundRect(UIView* view){
     view.layer.cornerRadius = 5.0f;
     view.layer.masksToBounds = YES;
 }
@@ -826,7 +826,7 @@ static inline void layerStyleRoundRect(UIView* view){
 /*
  * クリアブラックの角丸スタイルを設定する。
  */
-static inline void layerStyleRoundRectAndClearBlack(UIView* view){
+NS_INLINE void layerStyleRoundRectAndClearBlack(UIView* view){
     view.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.5f];
     layerStyleRoundRect(view);
 }
@@ -834,7 +834,7 @@ static inline void layerStyleRoundRectAndClearBlack(UIView* view){
 /*
  * クリアブラックの角丸スタイルを設定する。
  */
-static inline void layerStyleRoundRectAndSmokeWhite(UIView* view){
+NS_INLINE void layerStyleRoundRectAndSmokeWhite(UIView* view){
     view.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.5f];
     layerStyleRoundRect(view);
 }
@@ -852,7 +852,7 @@ static inline void layerStyleRoundRectAndSmokeWhite(UIView* view){
 /*
  * 角丸四角形を描画する
  */
-static inline void
+NS_INLINE void
 drawRoundRect(CGContextRef context, CGRect rect, CGFloat radius, CGColorRef color){
     
     CGContextSetFillColorWithColor(context, color);
@@ -875,7 +875,7 @@ drawRoundRect(CGContextRef context, CGRect rect, CGFloat radius, CGColorRef colo
 /*
  * コンテキストに角丸矩形のPathを追加する。
  */
-static inline void
+NS_INLINE void
 CGContextAddRoundRect(CGContextRef context, CGRect rect, CGFloat radius){
     float top   = rect.origin.y;
     float bottom= top  + rect.size.height;
@@ -894,7 +894,7 @@ CGContextAddRoundRect(CGContextRef context, CGRect rect, CGFloat radius){
  * コンテキストに角丸矩形のPathを追加する。
  * UIRectCorner列挙体を使用して、丸める角を指定できる。
  */
-static inline void
+NS_INLINE void
 CGContextAddRoundRectByRoundingCorners
 (CGContextRef context, CGRect rect, CGFloat radius, UIRectCorner corners){
     
@@ -935,7 +935,7 @@ CGContextAddRoundRectByRoundingCorners
 /*
  * ２色の線形グラデーションを行う。
  */
-static inline void CGContextDrawLinearGradientWithTwoColor
+NS_INLINE void CGContextDrawLinearGradientWithTwoColor
 (CGContextRef context,
  CGColorRef color1, CGColorRef color2,
  CGPoint    point1, CGPoint    point2)
@@ -976,7 +976,7 @@ static inline void CGContextDrawLinearGradientWithTwoColor
 /*
  * 今の音量を取得する。0-1
  */
-static inline float MPMusicPlayerControllerGetVolume(){
+NS_INLINE float MPMusicPlayerControllerGetVolume(){
     MPMusicPlayerController* musicPlayer =
     [MPMusicPlayerController applicationMusicPlayer];
     return musicPlayer.volume;
@@ -985,7 +985,7 @@ static inline float MPMusicPlayerControllerGetVolume(){
 /*
  * 音量を設定する。0-1
  */
-static inline void MPMusicPlayerControllerSetVolume(float volume){
+NS_INLINE void MPMusicPlayerControllerSetVolume(float volume){
     MPMusicPlayerController* musicPlayer =
     [MPMusicPlayerController applicationMusicPlayer];
     musicPlayer.volume = volume;
@@ -994,7 +994,7 @@ static inline void MPMusicPlayerControllerSetVolume(float volume){
 /*
  * 今の音量から増減量を指定する。0-1
  */
-static inline void MPMusicPlayerControllerAddVolume(float addVolume){
+NS_INLINE void MPMusicPlayerControllerAddVolume(float addVolume){
     MPMusicPlayerController* musicPlayer =
     [MPMusicPlayerController applicationMusicPlayer];
     musicPlayer.volume += addVolume;
@@ -1015,7 +1015,7 @@ static inline void MPMusicPlayerControllerAddVolume(float addVolume){
  * 通知発行も必要ないなら、
  * MPMusicPlayerControllerGeneratingPlaybackNotifications関数で通知発行を停止しましょう。
  */
-static inline void
+NS_INLINE void
 MPMusicPlayerControllerRegisterVolumeDidChangeNotification(id observer, SEL selector){
     
     // 通知センターへ登録
@@ -1034,7 +1034,7 @@ MPMusicPlayerControllerRegisterVolumeDidChangeNotification(id observer, SEL sele
  * 通知の必要がなくなったら、無効にしましょう。
  * bBegin: YES->有効 NO->無効
  */
-static inline void
+NS_INLINE void
 MPMusicPlayerControllerGeneratingPlaybackNotifications(BOOL bBegin){
     MPMusicPlayerController* musicPlayer = [MPMusicPlayerController applicationMusicPlayer];
     if (bBegin){
@@ -1064,7 +1064,7 @@ MPMusicPlayerControllerGeneratingPlaybackNotifications(BOOL bBegin){
  * kVerySmallValue:  最小精度を指定する。
  * 例）0.01f -> 0.01fより差があれば同じとは判断しない。
  */
-static inline BOOL
+NS_INLINE BOOL
 CGFloatIsEqual(CGFloat f1, CGFloat f2, CGFloat kVerySmallValue){
     return !(fabsf(f1 - f2) > kVerySmallValue);
 }
@@ -1072,7 +1072,7 @@ CGFloatIsEqual(CGFloat f1, CGFloat f2, CGFloat kVerySmallValue){
 /*
  * 指定イメージから切り抜いたUIImageを取得する。
  */
-static inline UIImage*
+NS_INLINE UIImage*
 UIImageCreateWithImageInRect(UIImage* sourceImage, CGRect inRect){
     UIImage*       image = nil;
     CGImageRef image_ref =
@@ -1090,7 +1090,7 @@ UIImageCreateWithImageInRect(UIImage* sourceImage, CGRect inRect){
  * デバイス向きを考慮した、適切なスクリーンサイズを取得する。
  * (ステータスバーの幅を引いた値)
  */
-static inline CGSize
+NS_INLINE CGSize
 UIInterfaceOrientationConsideredScreenSize(UIInterfaceOrientation interfaceOrientation){
     CGSize screenSize = [[UIScreen mainScreen] bounds].size;
     return UIInterfaceOrientationIsPortrait(interfaceOrientation)?
@@ -1100,14 +1100,14 @@ UIInterfaceOrientationConsideredScreenSize(UIInterfaceOrientation interfaceOrien
 /*
  * カレントデバイスがiPadならYES
  */
-static inline BOOL is_ipad(){
+NS_INLINE BOOL is_ipad(){
     return (UIUserInterfaceIdiomPad == [UIDevice currentDevice].userInterfaceIdiom);
 }
 
 /*
  * カレントデバイスがiPhoneならYES
  */
-static inline BOOL is_iphone(){
+NS_INLINE BOOL is_iphone(){
     return (UIUserInterfaceIdiomPhone == [UIDevice currentDevice].userInterfaceIdiom);
 }
 
@@ -1115,28 +1115,28 @@ static inline BOOL is_iphone(){
 /*
  * class_getName関数を使用して、クラス名を取得する。
  */
-static inline NSString* getClassName(id object){
+NS_INLINE NSString* getClassName(id object){
     return [NSString stringWithUTF8String: class_getName([object class])];
 }
 
 /*
  * CGSize構造体用の文字列を生成する。
  */
-static inline NSString* CGSizeToString(CGSize size){
+NS_INLINE NSString* CGSizeToString(CGSize size){
     return [NSString stringWithFormat: @"%fx%f", size.width, size.height ];
 }
 
 /*
  * CGPoint構造体用の文字列を生成する。
  */
-static inline NSString* CGPointToString(CGPoint point){
+NS_INLINE NSString* CGPointToString(CGPoint point){
     return [NSString stringWithFormat: @"%f,%f", point.x, point.y];
 }
 
 /*
  * CGRect構造体用の文字列を生成する。
  */
-static inline NSString* CGRectToString(CGRect rect){
+NS_INLINE NSString* CGRectToString(CGRect rect){
     return [NSString stringWithFormat: @"%f,%f %fx%f",
             rect.origin.x, rect.origin.y, rect.size.width, rect.size.height];
 }
@@ -1146,7 +1146,7 @@ static inline NSString* CGRectToString(CGRect rect){
  * UIRecogenizerのタッチイベントから、座標を取得する。
  * view: 基準座標となるビュー
  */
-static inline CGPoint getTouchPoint(NSSet* touches, UIView* view){
+NS_INLINE CGPoint getTouchPoint(NSSet* touches, UIView* view){
     UITouch* touch = [touches anyObject];
     return [touch locationInView:view];
 }
@@ -1154,14 +1154,14 @@ static inline CGPoint getTouchPoint(NSSet* touches, UIView* view){
 /*
  * 半透明の黒色
  */
-static inline UIColor* clearBlack(){
+NS_INLINE UIColor* clearBlack(){
     return [UIColor colorWithWhite:0.0f alpha:0.5f];
 }
 
 /*
  * 半透明の白色
  */
-static inline UIColor* clearWhite(){
+NS_INLINE UIColor* clearWhite(){
     return [UIColor colorWithWhite:1.0f alpha:0.3f];
 }
 
@@ -1169,14 +1169,14 @@ static inline UIColor* clearWhite(){
 /*
  * 数値文字列を整数値に変換する。
  */
-static inline int strToInt(NSString* str){
+NS_INLINE int strToInt(NSString* str){
     return [str integerValue];
 }
 
 /*
  * システムフォントを取得する。
  */
-static inline UIFont* systemFontOfSize(CGFloat size){
+NS_INLINE UIFont* systemFontOfSize(CGFloat size){
     return [UIFont systemFontOfSize:size];
 }
 
@@ -1185,7 +1185,7 @@ static inline UIFont* systemFontOfSize(CGFloat size){
 /*
  * UUID文字列を生成する
  */
-static inline NSString* UUIDGenerate(){
+NS_INLINE NSString* UUIDGenerate(){
     CFUUIDRef   uuidRef = CFUUIDCreate(kCFAllocatorDefault);
     CFStringRef uuidStr = CFUUIDCreateString(kCFAllocatorDefault, uuidRef);
     CFRelease(uuidRef);
@@ -1198,7 +1198,7 @@ static inline NSString* UUIDGenerate(){
 /*
  * 指定のサイズに丁度フィットするCGRectを計算する。
  */
-static inline CGRect rectToFit(CGSize size, CGSize contentSize){
+NS_INLINE CGRect rectToFit(CGSize size, CGSize contentSize){
     // 縮小率を計算する
     CGFloat max_w = contentSize.width;
     CGFloat max_h = contentSize.height;
@@ -1222,7 +1222,7 @@ static inline CGRect rectToFit(CGSize size, CGSize contentSize){
  * @delegate
  * - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
  */
-static inline void
+NS_INLINE void
 UIAlertViewShowConfirm(NSString* msg, id<UIAlertViewDelegate> delegate){
     NSString* lang = NSLocaleLanguage();
     BOOL     is_ja = [lang isEqualToString:@"ja"];
@@ -1240,7 +1240,7 @@ UIAlertViewShowConfirm(NSString* msg, id<UIAlertViewDelegate> delegate){
 /*
  * 簡単なアラートメッセージを表示する。
  */
-static inline void UIAlertViewShowMessage(NSString* msg){
+NS_INLINE void UIAlertViewShowMessage(NSString* msg){
     NSString*    productName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
     UIAlertView* alert       = [[UIAlertView alloc]
                                 initWithTitle:productName
@@ -1257,7 +1257,7 @@ static inline void UIAlertViewShowMessage(NSString* msg){
  * バッテリステートを文字列で取得します。
  * 関数内でbatteryMonitoringEnabledをYESに設定します。
  */
-static inline NSString* getBatteryState(){
+NS_INLINE NSString* getBatteryState(){
     UIDevice* device = [UIDevice currentDevice];
     device.batteryMonitoringEnabled = YES;
     UIDeviceBatteryState state = device.batteryState;
@@ -1284,7 +1284,7 @@ static inline NSString* getBatteryState(){
  * バッテリレベルを文字列で取得します。
  * 関数内でbatteryMonitoringEnabledをYESに設定します。
  */
-static inline NSString* getBatteryLevel(){
+NS_INLINE NSString* getBatteryLevel(){
     UIDevice* device = [UIDevice currentDevice];
     device.batteryMonitoringEnabled = YES;
     float batteryLevel = device.batteryLevel;
@@ -1310,7 +1310,7 @@ static inline NSString* getBatteryLevel(){
  * UIDeviceBatteryLevelDidChangeNotification
  * UIDeviceBatteryStateDidChangeNotification
  */
-static inline void registerBatteryNotificationObserver(id observer, SEL selector){
+NS_INLINE void registerBatteryNotificationObserver(id observer, SEL selector){
     UIDevice* device = [UIDevice currentDevice];
     device.batteryMonitoringEnabled = YES;
     
@@ -1328,7 +1328,7 @@ static inline void registerBatteryNotificationObserver(id observer, SEL selector
  * 通知センターに登録したオブザーバを削除する。
  * オブザーバに登録したクラスはdealloc メソッドで削除しておく。
  */
-static inline void NSNotificationCenterRemoveObserver(id observer){
+NS_INLINE void NSNotificationCenterRemoveObserver(id observer){
     [[NSNotificationCenter defaultCenter] removeObserver:observer];
 }
 
@@ -1339,7 +1339,7 @@ static inline void NSNotificationCenterRemoveObserver(id observer){
  * shouldAutorotateToInterfaceOrientationメソッドで使用してください。
  * - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
  */
-static inline BOOL orientationPermitForUpAndDownside(UIInterfaceOrientation interfaceOrientation){
+NS_INLINE BOOL orientationPermitForUpAndDownside(UIInterfaceOrientation interfaceOrientation){
     switch (interfaceOrientation) {
         case UIInterfaceOrientationPortrait:
         case UIInterfaceOrientationPortraitUpsideDown:
@@ -1361,7 +1361,7 @@ static inline BOOL orientationPermitForUpAndDownside(UIInterfaceOrientation inte
  * TWTweetComposeViewControllerを使用して、ツイートを行う。
  * <Twitter/TWTweetComposeViewController.h>のインポートと、Twitter.frameworkが必要。
  */
-static inline void tweetComposeShow(NSString* initialTweet, UIImage* image, UIViewController* viewController){
+NS_INLINE void tweetComposeShow(NSString* initialTweet, UIImage* image, UIViewController* viewController){
     TWTweetComposeViewController* tweet_view = [[TWTweetComposeViewController alloc] init];
     [tweet_view setInitialText:initialTweet];
     if (nil == image){ [tweet_view addImage:image]; }
