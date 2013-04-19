@@ -363,16 +363,24 @@ NS_INLINE double gettime(){
 
 /*
  * 繰り返しタイマーをセットする。
- * - (void)tick:(NSTimer*)sender
+ * - (void)tick:(NSTimer*)timer
  */
-NS_INLINE void scheduledTimer(double interval, id target, SEL action){
+NS_INLINE NSTimer* NSTimerStart(double interval, id target, SEL action){
+    NSTimer* timer =
     [NSTimer scheduledTimerWithTimeInterval:interval
                                      target:target
                                    selector:action
                                    userInfo:nil
                                     repeats:YES];
+    return timer;
 }
 
+/*
+ * タイマーを停止させる。
+ */
+NS_INLINE void NSTimerStop(NSTimer* timer){
+    [timer invalidate];
+}
 
 
 /*------------------------------------------------------------------------------
@@ -621,49 +629,6 @@ imageImmediateLoadWithContentsOfFile(NSString* path){
     return decompressedImage;
 }
 
-/*
- * UIImageからUIImageViewを作成し、parentViewに追加する。 サイズはフィットするように配置される。
- * 成功時には作成したUIImageViewのオブジェクトが返る。
- */
-NS_INLINE UIImageView*
-imageViewAddToParent(UIImage* image, UIView* parentView){
-    UIImageView* imageView = [[UIImageView alloc] initWithImage:image];
-    // アスペクト比が崩れないように親ビューにフィットさせる。
-    imageView.contentMode = UIViewContentModeScaleAspectFit;
-    imageView.frame = parentView.bounds;
-    [parentView addSubview:imageView];
-    return imageView;
-}
-
-
-/*
- * UIImageViewをparentViewに追加する。 サイズはフィットするように配置される。
- * 成功時には作成したUIImageViewのオブジェクトが返る。
- */
-NS_INLINE UIImageView*
-imageAddBasicFromResource(NSString* imageName, UIView* parentView){
-    UIImage* image = [UIImage imageNamed:imageName];
-    if (nil == image) {
-        dmsg(@"イメージの読み込みに失敗しました。");
-        return nil;
-    }
-    return imageViewAddToParent(image, parentView);
-}
-
-/*
- * UIImageViewをparentViewに追加する。 サイズはフィットするように配置される。
- * 成功時には作成したUIImageViewのオブジェクトが返る。
- */
-NS_INLINE UIImageView*
-imageAddBasicFromPath(NSString* imagePath, UIView* parentView){
-    UIImage* image = imageImmediateLoadWithContentsOfFile(imagePath);
-    if (nil == image) {
-        dmsg(@"イメージの読み込みに失敗しました。");
-        return nil;
-    }
-    return imageViewAddToParent(image, parentView);
-}
-
 
 /*
  * 簡易なUIButtonをparentViewに追加する。
@@ -789,6 +754,52 @@ NS_INLINE UIPinchGestureRecognizer* pinchRecognizerAddToView(UIView* view, id ta
     [recognizer addTarget:target action:action];
     [view addGestureRecognizer:recognizer];
     return recognizer;
+}
+
+
+
+#pragma mark UIImageView
+
+/*
+ * UIImageからUIImageViewを作成し、parentViewに追加する。 サイズはフィットするように配置される。
+ * 成功時には作成したUIImageViewのオブジェクトが返る。
+ */
+NS_INLINE UIImageView*
+UIImageViewAddToParent(UIImage* image, UIView* parentView){
+    UIImageView* imageView = [[UIImageView alloc] initWithImage:image];
+    // アスペクト比が崩れないように親ビューにフィットさせる。
+    imageView.contentMode = UIViewContentModeScaleAspectFit;
+    imageView.frame = parentView.bounds;
+    [parentView addSubview:imageView];
+    return imageView;
+}
+
+
+/*
+ * UIImageViewをparentViewに追加する。 サイズはフィットするように配置される。
+ * 成功時には作成したUIImageViewのオブジェクトが返る。
+ */
+NS_INLINE UIImageView*
+UIImageViewAddBasicFromResource(NSString* imageName, UIView* parentView){
+    UIImage* image = [UIImage imageNamed:imageName];
+    if (nil == image) {
+        dmsg(@"イメージの読み込みに失敗しました。");
+        return nil;
+    }
+    return UIImageViewAddToParent(image, parentView);
+}
+/*
+ * UIImageViewをparentViewに追加する。 サイズはフィットするように配置される。
+ * 成功時には作成したUIImageViewのオブジェクトが返る。
+ */
+NS_INLINE UIImageView*
+UIImageViewAddBasicFromPath(NSString* imagePath, UIView* parentView){
+    UIImage* image = imageImmediateLoadWithContentsOfFile(imagePath);
+    if (nil == image) {
+        dmsg(@"イメージの読み込みに失敗しました。");
+        return nil;
+    }
+    return UIImageViewAddToParent(image, parentView);
 }
 
 
