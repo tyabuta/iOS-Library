@@ -389,6 +389,29 @@ NS_INLINE void NSTimerStop(NSTimer* timer){
 #pragma mark -
 #pragma mark View functions
 
+
+
+/*
+ * 指定ビューのalpha値を指定された値までアニメーションさせます。
+ * 指定ビューの初期値は設定しておく必要があります。
+ * アニメーション終了時にイベントが欲しい場合は、delegateとactionを設定してください。
+ * 不要な場合はnilを渡してください。
+ */
+NS_INLINE void
+UIViewAnimationFade(UIView* view, CGFloat alpha, id delegate, SEL action){
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    [UIView beginAnimations:nil context:context];
+    [UIView setAnimationCurve:UIViewAnimationCurveLinear];
+    [UIView setAnimationDuration:0.3f];
+    if (delegate){
+        [UIView setAnimationDelegate:delegate];
+        [UIView setAnimationDidStopSelector:action];
+    }
+    view.alpha = alpha;
+    [UIView commitAnimations];
+}
+
+
 /*
  * 指定のビューが中央にくるように配置した場合のframe値を返す。
  */
