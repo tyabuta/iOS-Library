@@ -21,6 +21,7 @@
 #import <objc/objc-runtime.h>
 #else
 #import <objc/runtime.h>
+#import <objc/message.h> // objc_msgSend関数に必要
 #endif
 
 
@@ -29,15 +30,7 @@
  */
 #import <sys/time.h>
 
-/*
- * デバックログ用のマクロ、リリース時は何もおこらないようになる。
- * Tips: __VA_ARGS__ の前に##を付けると、引数ゼロでもコンパイルが通る。
- */
-#ifdef DEBUG
-#define dmsg(fmt, ...) NSLog((@"%s @%d " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__);
-#else
-#define dmsg(...)
-#endif
+
 
 /*
  * 配列個数の取得
@@ -58,6 +51,28 @@
  * システムボリュームの丁度一目盛り分の値
  */
 #define SOUND_VOLUME_ONE 0.0625f
+
+
+
+
+/*
+ * デバックログ用のマクロ、リリース時は何もおこらないようになる。
+ * Tips: __VA_ARGS__ の前に##を付けると、引数ゼロでもコンパイルが通る。
+ */
+#ifdef DEBUG
+#define dmsg(fmt, ...) NSLog((@"%s @%d " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__);
+#else
+#define dmsg(...)
+#endif
+
+
+/*
+ * オブジェクトにメッセージを送る。
+ * respondsToSelectorメソッドを使って、事前に確認を行います。
+ *
+ */
+#define msgSend(obj, sel, ...) \
+{ [obj respondsToSelector:sel] && objc_msgSend(obj, sel, ## __VA_ARGS__); }
 
 
 
