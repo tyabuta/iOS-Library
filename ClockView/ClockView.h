@@ -9,5 +9,8 @@
 
 @interface ClockView : UIView
 - (id)initWithFrame:(CGRect)frame;
+
+@property(nonatomic) CGFloat padding;
+
 @end
 

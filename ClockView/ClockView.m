@@ -11,24 +11,29 @@
 {
     UILabel*         _label;
     NSDateFormatter* _formatter;
-
+    int              _count;
 }
 
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
-        // Initialization code
         
+    
+        // 初期値
+        _padding = 10.0f;
+        
+        self.backgroundColor = [UIColor blueColor];
+        
+        // フォーマッター
         _formatter = [[NSDateFormatter alloc] init];
         
         // ラベル設定
-        _label = [[UILabel alloc] initWithFrame:self.bounds];
-        _label.font            = [UIFont systemFontOfSize:50.0f];
+        _label = [[UILabel alloc] initWithFrame:CGRectNull];
         _label.textColor       = [UIColor greenColor];
+        _label.backgroundColor = [UIColor redColor];
         _label.textAlignment   = NSTextAlignmentCenter;
-        _label.backgroundColor = [UIColor clearColor];
-        _label.shadowOffset    = CGSizeMake(3.0f, 3.0f);
+        _label.shadowOffset    = CGSizeMake(2.0f, 2.0f);
         _label.shadowColor     = [UIColor blackColor];
         [self addSubview:_label];
         
@@ -39,6 +44,7 @@
                                        userInfo:nil
                                         repeats:YES];
         // 初回更新
+        _count = 0;
         [self tick:nil];
     }
     return self;
@@ -46,15 +52,35 @@
 
 - (void)tick:(NSTimer*)sender
 {
-    static int count = 0;
-    _formatter.dateFormat = (count++ % 2)? @"HH:mm" : @"HH mm";
+    _formatter.dateFormat = (_count++ % 2)? @"HH:mm" : @"HH mm";
     _label.text = [_formatter stringFromDate:[NSDate date]];
 }
 
 
-- (void)layoutSubviews{
-    _label.frame = self.bounds;
+- (void)setPadding:(CGFloat)padding{
+    if (padding != _padding){
+        _padding = padding;
+        [self setNeedsLayout];
+    }
 }
 
+- (void)layoutSubviews{
+    float w =  self.bounds.size.width;
+    float h = self.bounds.size.height;
+    
+    float font_size    = h - (_padding*2.0f);
+    float label_width  = w - (_padding*2.0f);
+    float label_height = font_size;
+    float label_top    = (h - label_height)/2.0f;
+    float label_left   = (w - label_width )/2.0f;
+    
+    _label.frame = CGRectMake(label_left, label_top, label_width, label_height);
+    _label.font = [UIFont systemFontOfSize:font_size];
+    
+}
 
 @end
+
+
+
+
