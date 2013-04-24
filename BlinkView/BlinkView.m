@@ -2,8 +2,10 @@
 #import "BlinkView.h"
 
 
-#pragma mark -
-#pragma mark Macros
+/*------------------------------------------------------------------------------
+ Macro funcitons
+ -----------------------------------------------------------------------------*/
+#pragma mark - Macro functions
 
 /*
  * 繰り返しタイマーをセットする。
@@ -29,8 +31,10 @@ NS_INLINE void NSTimerStop(NSTimer* timer){
 
 
 
-#pragma mark -
-#pragma Implementation BlinkView
+/*------------------------------------------------------------------------------
+ Implementation BlinkView
+ -----------------------------------------------------------------------------*/
+#pragma mark - Implementation BlinkView
 
 @implementation BlinkView {
     NSTimer* _timer;
@@ -60,11 +64,44 @@ NS_INLINE void NSTimerStop(NSTimer* timer){
     self.hidden = !self.hidden;    
 }
 
+/*
+ * intervalプロパティのセッター
+ */
+- (void)setInterval:(CGFloat)interval {
+    
+    // インターバルに変更があれば、更新する。
+    if (_interval != interval){
+        _interval = interval;
+        
+        // 点滅中であれば、一旦停止して再稼働させる。
+        if ([self isBlink]){
+            [self stopBlink];
+            [self startBlink];
+        }
+    }
+}
+@end
 
 
 
-#pragma mark Methods
 
+/*------------------------------------------------------------------------------
+ Action methods
+ -----------------------------------------------------------------------------*/
+@implementation BlinkView(Action)
+
+/*
+ * 点滅を開始する、点滅の間隔についてはintervalプロパティで設定する。
+ */
+- (void)startBlink {
+    if (nil == _timer){
+        _timer = NSTimerStart(_interval, self, @selector(tick:));
+    }
+}
+
+/*
+ * 点滅を停止し、ビュー表示を消す。
+ */
 - (void)stopBlink {
     if (_timer){
         NSTimerStop(_timer);
@@ -73,25 +110,22 @@ NS_INLINE void NSTimerStop(NSTimer* timer){
     self.hidden = YES;
 }
 
-- (void)startBlink {
-    if (nil == _timer){
-        _timer = NSTimerStart(0.1f, self, @selector(tick:));
-    }
-}
-
-
 @end
 
 
 
+/*------------------------------------------------------------------------------
+ Property methods
+ -----------------------------------------------------------------------------*/
+@implementation BlinkView(Property)
+/*
+ * 点滅中か調べる。
+ */
+- (BOOL)isBlink{
+    return (nil != _timer);
+}
 
 
-
-
-
-
-
-
-
+@end
 
 
