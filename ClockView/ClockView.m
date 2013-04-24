@@ -23,15 +23,13 @@
         // 初期値
         _padding = 10.0f;
         
-        self.backgroundColor = [UIColor blueColor];
-        
         // フォーマッター
         _formatter = [[NSDateFormatter alloc] init];
         
         // ラベル設定
         _label = [[UILabel alloc] initWithFrame:CGRectNull];
         _label.textColor       = [UIColor greenColor];
-        _label.backgroundColor = [UIColor redColor];
+        _label.backgroundColor = [UIColor clearColor];
         _label.textAlignment   = NSTextAlignmentCenter;
         _label.shadowOffset    = CGSizeMake(2.0f, 2.0f);
         _label.shadowColor     = [UIColor blackColor];
