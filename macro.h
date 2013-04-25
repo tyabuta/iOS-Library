@@ -1,5 +1,5 @@
 /*******************************************************************************
-  macro.h 1.6.2.16
+  macro.h 1.6.3.17
 
                               マクロ関数用のヘッダ
  
@@ -710,62 +710,6 @@ buttonAddCustum(NSString* imageNameForNormal, NSString* imageNameForHighlighted,
 
 
 /*
- * 簡単なラベルを作成し、　parentViewに追加する。
- * センター文字、背景はクリアブラックに設定。
- * fontSize 設定不要な場合は-1を渡す。
- */
-static UILabel* labelAddBasic(NSString* text, CGRect frame, CGFloat fontSize, UIView* parentView){
-    UILabel* label = [[UILabel alloc] initWithFrame:frame];
-    label.text = text;
-    label.textAlignment = NSTextAlignmentCenter;
-    label.backgroundColor = [UIColor colorWithWhite:0 alpha:0.5f];
-    if (0 < fontSize){
-        label.font = [UIFont systemFontOfSize:fontSize];
-    }
-    
-    [parentView addSubview:label];
-    return label;
-}
-
-/*
- * ヘッダー用のラベルを追加する。
- */
-static UILabel* labelAddHeader(NSString* caption, UIView* parentView){
-    UILabel* header = [[UILabel alloc] init];
-    header.text = caption;
-    header.textColor = [UIColor whiteColor];
-    header.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.5f];
-    header.textAlignment = NSTextAlignmentCenter;
-    header.frame = CGRectMake(0, 0, parentView.bounds.size.width, 30);
-    header.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    [parentView addSubview:header];
-    return header;
-}
-
-/*
- * ヘッダ用のラベルを追加する。
- */
-static UILabel* labelAddFooter(NSString* caption, UIView* parentView){
-    const CGFloat height = 30.0f;
-    
-    UILabel* header = [[UILabel alloc] init];
-    header.text = caption;
-    header.textColor = [UIColor whiteColor];
-    header.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.5f];
-    header.textAlignment = NSTextAlignmentCenter;
-    header.frame = CGRectMake(0,
-                              parentView.bounds.size.width - height,
-                              parentView.bounds.size.width,
-                              height);
-    header.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    [parentView addSubview:header];
-    return header;
-}
-
-
-
-
-/*
  * 簡単なテキストフィールドを作成し、　parentViewに追加する。
  * センター文字に設定。
  * fontSize 設定不要な場合は-1を渡す。
@@ -794,6 +738,68 @@ NS_INLINE UIPinchGestureRecognizer* pinchRecognizerAddToView(UIView* view, id ta
     return recognizer;
 }
 
+
+#pragma mark UILabelView
+
+NS_INLINE void UILabelSetShadow(UILabel* label){
+    label.shadowColor  = [UIColor blackColor];
+    label.shadowOffset = CGSizeMake(1.0f, 1.0f);
+}
+
+/*
+ * 簡単なラベルを作成し、　parentViewに追加する。
+ * センター文字、背景はクリアブラックに設定。
+ * fontSize 設定不要な場合は-1を渡す。
+ */
+NS_INLINE UILabel*
+UILabelAddBasic(NSString* text, CGRect frame, CGFloat fontSize, UIView* parentView){
+    UILabel* label = [[UILabel alloc] initWithFrame:frame];
+    label.text = text;
+    label.textAlignment = NSTextAlignmentCenter;
+    label.backgroundColor = [UIColor colorWithWhite:0 alpha:0.5f];
+    if (0 < fontSize){
+        label.font = [UIFont systemFontOfSize:fontSize];
+    }
+    
+    [parentView addSubview:label];
+    return label;
+}
+
+
+/*
+ * ヘッダー用のラベルを追加する。
+ */
+static UILabel* UILabelAddHeader(NSString* caption, UIView* parentView){
+    UILabel* header = [[UILabel alloc] init];
+    header.text = caption;
+    header.textColor = [UIColor whiteColor];
+    header.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.5f];
+    header.textAlignment = NSTextAlignmentCenter;
+    header.frame = CGRectMake(0, 0, parentView.bounds.size.width, 30);
+    header.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    [parentView addSubview:header];
+    return header;
+}
+
+/*
+ * ヘッダ用のラベルを追加する。
+ */
+static UILabel* UILabelAddFooter(NSString* caption, UIView* parentView){
+    const CGFloat height = 30.0f;
+    
+    UILabel* header = [[UILabel alloc] init];
+    header.text = caption;
+    header.textColor = [UIColor whiteColor];
+    header.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.5f];
+    header.textAlignment = NSTextAlignmentCenter;
+    header.frame = CGRectMake(0,
+                              parentView.bounds.size.width - height,
+                              parentView.bounds.size.width,
+                              height);
+    header.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    [parentView addSubview:header];
+    return header;
+}
 
 
 #pragma mark UIImageView
