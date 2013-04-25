@@ -80,8 +80,7 @@
 /*------------------------------------------------------------------------------
                            Application functions
  -----------------------------------------------------------------------------*/
-#pragma mark -
-#pragma mark Application functions
+#pragma mark - Application functions
 
 
 /*
@@ -223,8 +222,7 @@ rootViewControllerSetup(UIResponder<UIApplicationDelegate>* appDelegate,
 /*------------------------------------------------------------------------------
                              File IO functions
  -----------------------------------------------------------------------------*/
-#pragma mark -
-#pragma mark  File IO functions
+#pragma mark - File IO functions
 
 
 /*
@@ -272,8 +270,7 @@ NS_INLINE NSString* getModulePath(){
 /*------------------------------------------------------------------------------
                            Network functions
  -----------------------------------------------------------------------------*/
-#pragma mark -
-#pragma mark  Network functions
+#pragma mark - Network functions
 
 
 /*
@@ -344,8 +341,7 @@ NS_INLINE NSString* stringEncode(NSString* str){
 /*------------------------------------------------------------------------------
                               Chrono functions
  -----------------------------------------------------------------------------*/
-#pragma mark -
-#pragma mark  Chrono functions
+#pragma mark - Chrono functions
 
 /*
  * 日付をYYYYMMDD形式の文字列に変換する。
@@ -401,8 +397,7 @@ NS_INLINE void NSTimerStop(NSTimer* timer){
 /*------------------------------------------------------------------------------
                                View functions
  -----------------------------------------------------------------------------*/
-#pragma mark -
-#pragma mark View functions
+#pragma mark - View functions
 
 
 
@@ -850,8 +845,7 @@ UIImageViewAddBasicFromPath(NSString* imagePath, UIView* parentView){
 /*------------------------------------------------------------------------------
  QuartzCore functions
  -----------------------------------------------------------------------------*/
-#pragma mark -
-#pragma mark QuartzCore functions
+#pragma mark - QuartzCore functions
 
 /*
  * #import <QuartzCore/QuartzCore.h>
@@ -905,8 +899,20 @@ NS_INLINE void layerStyleRoundRectAndSmokeWhite(UIView* view){
 /*------------------------------------------------------------------------------
  CoreGraphics functions
  -----------------------------------------------------------------------------*/
-#pragma mark -
-#pragma mark CoreGraphics functions
+#pragma mark - CoreGraphics functions
+
+
+/*
+ * CGPoint配列全てにアフィン変換を行う。
+ */
+NS_INLINE void
+CGPointArrayApplyAffineTransform
+(const CGPoint srcPts[], size_t count, CGPoint dstPts[], CGAffineTransform t) {
+    for (int i=0; i<count; i++){
+        dstPts[i] = CGPointApplyAffineTransform(srcPts[i], t);
+    }
+}
+
 
 /*
  * CGPoint配列全ての要素に指定の倍数を掛ける。
@@ -928,6 +934,19 @@ CGPointArrayOffset(CGPoint points[], size_t count, CGFloat dx, CGFloat dy){
         points[i].x += dx;
         points[i].y += dy;
     }
+}
+
+/*
+ * CGPoint配列から、Pathを作成する。
+ * コンテキストには作成したPathが設定された状態ですので、
+ * CGContextAddPath関数をすぐに呼ぶ必要はありません。
+ * 作成したPathはCGPathRelease関数で解放する必要があります。
+ */
+NS_INLINE CGPathRef
+CGContextPathCreateFromPoints(CGContextRef context, CGPoint points[], size_t count){
+    CGContextAddLines(context, points, count);
+    CGContextClosePath(context);
+    return CGContextCopyPath(context);
 }
 
 
@@ -1012,6 +1031,19 @@ CGContextFillRoundRect(CGContextRef context, CGRect rect, CGFloat radius){
 }
 
 /*
+ * 色付きの矩形描画を行う。
+ */
+NS_INLINE void
+CGContextFillRectWithColor(CGContextRef context, CGRect rect, CGColorRef color){
+    CGContextSaveGState(context);
+    
+    CGContextSetFillColorWithColor(context, color);
+    CGContextFillRect(context, rect);
+    
+    CGContextRestoreGState(context);
+}
+
+/*
  * ２色の線形グラデーションを行う。
  */
 NS_INLINE void CGContextDrawLinearGradientWithTwoColor
@@ -1043,8 +1075,7 @@ NS_INLINE void CGContextDrawLinearGradientWithTwoColor
 /*------------------------------------------------------------------------------
  MediaPlayer.framework functions
  -----------------------------------------------------------------------------*/
-#pragma mark -
-#pragma mark  MediaPlayer.framework functions
+#pragma mark - MediaPlayer.framework functions
 
 /*
  * #import <MediaPlayer/MediaPlayer.h>
@@ -1134,8 +1165,7 @@ MPMusicPlayerControllerGeneratingPlaybackNotifications(BOOL bBegin){
 /*------------------------------------------------------------------------------
                               Other functions
  -----------------------------------------------------------------------------*/
-#pragma mark -
-#pragma mark Other functions
+#pragma mark - Other functions
 
 
 /*
