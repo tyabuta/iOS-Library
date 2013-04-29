@@ -273,13 +273,14 @@ NS_INLINE NSString* getModulePath(){
 #pragma mark - Network functions
 
 
+
+
+
+
 /*
  * 指定のURLをリクエストし、NSDataオブジェクトを取得する。
  */
-NS_INLINE NSData* dataRequestWithURL(NSString* urlString){
-    // URL
-    NSURL* url = [NSURL URLWithString:urlString];
-    
+NS_INLINE NSData* NSURLRequestData(NSURL* url){
     // GET Request
     NSURLRequest*  request  = [NSURLRequest requestWithURL:url];
     NSURLResponse* response = nil;
@@ -295,8 +296,8 @@ NS_INLINE NSData* dataRequestWithURL(NSString* urlString){
  * 指定のURLでリクエストする。
  * 取得した内容は文字列として返す。
  */
-NS_INLINE NSString* stringRequestWithURL(NSString* urlString){
-    NSData* data = dataRequestWithURL(urlString);
+NS_INLINE NSString* NSURLRequestString(NSURL* url){
+    NSData* data = NSURLRequestData(url);
     
     // To string
     NSString* content = [[NSString alloc] initWithData:data
@@ -304,13 +305,12 @@ NS_INLINE NSString* stringRequestWithURL(NSString* urlString){
     return content;
 }
 
-
 /*
  * 指定のURLでリクエストする。
  * 取得した内容はディクショナリとして返す。
  */
-NS_INLINE NSDictionary* jsonRequestWithURL(NSString* urlString){
-    NSData*   data = dataRequestWithURL(urlString);
+NS_INLINE NSDictionary* NSURLRequestJson(NSURL* url){
+    NSData*   data = NSURLRequestData(url);
     NSError* error = nil;
     
     // To dictionary
@@ -320,10 +320,12 @@ NS_INLINE NSDictionary* jsonRequestWithURL(NSString* urlString){
     return dictionary;
 }
 
+
+
 /*
  * URLエンコードする
  */
-NS_INLINE NSString* stringEncode(NSString* str){
+NS_INLINE NSString* NSURLEncodeWithString(NSString* str){
     CFStringRef encodedString =
     CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
                                             (CFStringRef)str,
@@ -334,7 +336,80 @@ NS_INLINE NSString* stringEncode(NSString* str){
     NSString* nsString = [NSString stringWithString:(__bridge NSString*)encodedString];
     CFRelease(encodedString);
     return nsString;
+    
+    
 }
+
+/*
+ * ディクショナリから、URLリクエストパラメータを作成する。
+ * 各パラメータはURLエンコードされます。
+ * @{ @"q" : @"value" } => q=value
+ */
+NS_INLINE NSString*
+NSURLBuildParamWithDictionary(NSDictionary* params) {
+    NSMutableString *buf = [NSMutableString string];
+    for (NSString* key in params ) {
+        [buf appendFormat:@"%@=%@&", key, NSURLEncodeWithString(params[key])];
+    }
+    
+    // 末尾の不要な"&"を削除する。
+    if ([buf length] > 0) {
+        [buf deleteCharactersInRange:NSMakeRange(buf.length-1, 1)];
+    }
+    return buf;
+}
+
+/*
+ * 指定URLにPOSTする。
+ */
+NS_INLINE BOOL
+NSURLPostRequest(NSURL* url, NSDictionary* params, id<NSURLConnectionDelegate> delegate) {
+    // パラメータデータのオブジェクト作成
+    NSString* strParams = NSURLBuildParamWithDictionary(params);
+    NSData*  dataParams = [strParams dataUsingEncoding:NSUTF8StringEncoding];
+    
+    // リクエストオブジェクト作成
+    NSMutableURLRequest *request =
+    [[NSMutableURLRequest alloc] initWithURL:url
+                                 cachePolicy:NSURLRequestReloadIgnoringCacheData
+                             timeoutInterval:20];
+    [request setHTTPMethod:@"POST"];
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    [request setValue:[NSString stringWithFormat:@"%d", dataParams.length] forHTTPHeaderField:@"Content-Length"];
+    [request setHTTPBody:dataParams];
+    [request setHTTPShouldHandleCookies:YES];
+    
+    // POST 送信
+    dmsg(@"Posting [%@] (%d bytes) to %@ ...", strParams, [dataParams length], url);
+    NSURLConnection* conn = [[NSURLConnection alloc] initWithRequest:request delegate:delegate];
+    if (nil == conn) {
+        dmsg(@"NSURLConnection failed: in %s", __FUNCTION__);
+        return NO;
+    }
+    return YES;
+}
+
+/*
+ * HTTPリクエストのレスポンスヘッダの情報をダンプする。
+ */
+NS_INLINE void NSHTTPResponseDump(NSHTTPURLResponse* response){
+    NSMutableString* buf = [NSMutableString string];
+    [buf appendFormat:@"Received Response. Status Code: %d\n", response.statusCode];
+    [buf appendFormat:@"Expected ContentLength: %qi\n", response.expectedContentLength];
+    [buf appendFormat:@"MIMEType: %@\n", response.MIMEType];
+    [buf appendFormat:@"Suggested File Name: %@\n", response.suggestedFilename];
+    [buf appendFormat:@"Text Encoding Name: %@\n",  response.textEncodingName];
+    [buf appendFormat:@"URL: %@\n", response.URL];
+    NSDictionary *headerFields = response.allHeaderFields;
+    NSArray              *keys = headerFields.allKeys;
+    for (int i = 0; i < keys.count; i++) {
+        [buf appendFormat:@"\t%@: %@\n", keys[i], headerFields[keys[i]]];
+    }
+    dmsg(@"%@", buf);
+}
+
+
+
 
 
 
