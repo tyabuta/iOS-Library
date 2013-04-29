@@ -12,5 +12,7 @@
 
 @property(nonatomic) CGFloat padding;
 
+@property(strong, nonatomic) UIColor* textColor;
+
 @end
 

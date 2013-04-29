@@ -18,7 +18,6 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        
     
         // 初期値
         _padding = 10.0f;
@@ -26,9 +25,12 @@
         // フォーマッター
         _formatter = [[NSDateFormatter alloc] init];
         
+        // 初期の文字色はグリーン
+        _textColor = [UIColor greenColor];
+        
         // ラベル設定
         _label = [[UILabel alloc] initWithFrame:CGRectNull];
-        _label.textColor       = [UIColor greenColor];
+        _label.textColor       = _textColor;
         _label.backgroundColor = [UIColor clearColor];
         _label.textAlignment   = NSTextAlignmentCenter;
         _label.shadowOffset    = CGSizeMake(2.0f, 2.0f);
@@ -60,6 +62,11 @@
         _padding = padding;
         [self setNeedsLayout];
     }
+}
+
+- (void)setTextColor:(UIColor *)textColor{
+    _textColor       = textColor;
+    _label.textColor = textColor;
 }
 
 - (void)layoutSubviews{
