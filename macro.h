@@ -2,7 +2,7 @@
   macro.h 1.6.3.17
 
                               マクロ関数用のヘッダ
- 
+
                                                              (c) 2013 tyabuta.
 *******************************************************************************/
 
@@ -109,82 +109,6 @@ NS_INLINE NSString* getAppName(){
 }
 
 /*
- * UserDefaultsの全ての値を取得する。
- */
-NS_INLINE NSString* dumpAllDefaults(){
-    NSDictionary* dic = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
-    return [NSString stringWithFormat:@"defualts:%@", dic];
-}
-
-/*
- * UserDefaultsのアプリケーション固有の値を取得する。
- */
-NS_INLINE NSString* dumpAppDefaults(){
-    NSString*      appDomain = [[NSBundle mainBundle] bundleIdentifier];
-    NSDictionary*  dic       = [[NSUserDefaults standardUserDefaults] persistentDomainForName:appDomain];
-    return [NSString stringWithFormat:@"defualts:%@", dic];
-}
-
-
-/*
- * UserDefaultsに文字列を保存する。
- */
-NS_INLINE void setDefaultString(NSString* str, NSString* forKey){
-    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setValue:str forKey:forKey];
-    [userDefaults synchronize];
-}
-
-/*
- * UserDefaultsに数値を保存する。
- */
-NS_INLINE void setDefaultInteger(NSInteger intValue, NSString* forKey){
-    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setInteger:intValue forKey:forKey];
-    [userDefaults synchronize];
-}
-
-/*
- * UserDefaultsに小数値を保存する。
- */
-NS_INLINE void setDefaultFloat(float floatValue, NSString* forKey){
-    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setFloat:floatValue forKey:forKey];
-    [userDefaults synchronize];
-}
-
-/*
- * UserDefaultsに小数値を保存する。
- */
-NS_INLINE void removeDefaultKey(float floatValue, NSString* forKey){
-    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults removeObjectForKey:forKey];
-    [userDefaults synchronize];
-}
-
-/*
- * UserDefaultsから文字列を取得する。
- */
-NS_INLINE NSString* getDefaultString(NSString* key){
-    return [[NSUserDefaults standardUserDefaults] stringForKey:key];
-}
-
-/*
- * UserDefaultsから数値を取得する。
- */
-NS_INLINE NSInteger getDefaultInteger(NSString* key){
-    return [[NSUserDefaults standardUserDefaults] integerForKey:key];
-}
-
-/*
- * UserDefaultsから数値を取得する。
- */
-NS_INLINE float getDefaultFloat(NSString* key){
-    return [[NSUserDefaults standardUserDefaults] floatForKey:key];
-}
-
-
-/*
  * ステータスバーの非表示にする。
  */
 NS_INLINE void statusBarHidden(BOOL bHidden){
@@ -200,8 +124,6 @@ NS_INLINE void networkActivityIndicator(BOOL bVisible){
     [UIApplication sharedApplication].networkActivityIndicatorVisible = bVisible;
 }
 
-
-
 /*
  * AppDelegateクラスにViewControllerを設置する
  * 下記ハンドラで使用する
@@ -210,11 +132,95 @@ NS_INLINE void networkActivityIndicator(BOOL bVisible){
 NS_INLINE BOOL
 rootViewControllerSetup(UIResponder<UIApplicationDelegate>* appDelegate,
                         UIViewController*                   viewController){
-    
+
     appDelegate.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     [appDelegate.window setRootViewController:viewController];
     [appDelegate.window makeKeyAndVisible];
     return YES;
+}
+
+
+
+
+
+/*------------------------------------------------------------------------------
+ UserDefault functions
+ -----------------------------------------------------------------------------*/
+#pragma mark - UserDefault functions
+
+/*
+ * UserDefaultsの全ての値を取得する。
+ */
+NS_INLINE NSString* NSUserDefaultsDumpAll(){
+    NSDictionary* dic = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
+    return [NSString stringWithFormat:@"defualts:%@", dic];
+}
+
+/*
+ * UserDefaultsのアプリケーション固有の値を取得する。
+ */
+NS_INLINE NSString* NSUserDefaultsDumpApp(){
+    NSString*      appDomain = [[NSBundle mainBundle] bundleIdentifier];
+    NSDictionary*  dic       = [[NSUserDefaults standardUserDefaults] persistentDomainForName:appDomain];
+    return [NSString stringWithFormat:@"defualts:%@", dic];
+}
+
+
+/*
+ * UserDefaultsに文字列を保存する。
+ */
+NS_INLINE void NSUserDefaultsSetString(NSString* str, NSString* forKey){
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setValue:str forKey:forKey];
+    [userDefaults synchronize];
+}
+
+/*
+ * UserDefaultsに数値を保存する。
+ */
+NS_INLINE void NSUserDefaultsSetInteger(NSInteger intValue, NSString* forKey){
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setInteger:intValue forKey:forKey];
+    [userDefaults synchronize];
+}
+
+/*
+ * UserDefaultsに小数値を保存する。
+ */
+NS_INLINE void NSUserDefaultsSetFloat(float floatValue, NSString* forKey){
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setFloat:floatValue forKey:forKey];
+    [userDefaults synchronize];
+}
+
+/*
+ * UserDefaultsの指定キーを削除する。
+ */
+NS_INLINE void NSUserDefaultsRemoveKey(NSString* forKey){
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults removeObjectForKey:forKey];
+    [userDefaults synchronize];
+}
+
+/*
+ * UserDefaultsから文字列を取得する。
+ */
+NS_INLINE NSString* NSUserDefaultsGetString(NSString* key){
+    return [[NSUserDefaults standardUserDefaults] stringForKey:key];
+}
+
+/*
+ * UserDefaultsから数値を取得する。
+ */
+NS_INLINE NSInteger NSUserDefaultsGetInteger(NSString* key){
+    return [[NSUserDefaults standardUserDefaults] integerForKey:key];
+}
+
+/*
+ * UserDefaultsから数値を取得する。
+ */
+NS_INLINE float NSUserDefaultsGetFloat(NSString* key){
+    return [[NSUserDefaults standardUserDefaults] floatForKey:key];
 }
 
 
@@ -231,15 +237,15 @@ rootViewControllerSetup(UIResponder<UIApplicationDelegate>* appDelegate,
 static NSArray* getFilePathsFromResource(NSString* dir){
     NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
     NSString* rootDir      = [NSString stringWithFormat:@"%@/%@", resourcePath, dir];
-    
+
     NSFileManager* fileManager = [NSFileManager defaultManager];
     NSArray* fileArray = [fileManager contentsOfDirectoryAtPath: rootDir error:nil];
-    
+
     NSMutableArray* arr = [[NSMutableArray alloc] init];
     for (NSString* file in fileArray) {
         [arr addObject: [NSString stringWithFormat:@"%@/%@", rootDir, file]];
     }
-    
+
     return [NSArray arrayWithArray:arr];
 }
 
@@ -298,7 +304,7 @@ NS_INLINE NSData* NSURLRequestData(NSURL* url){
  */
 NS_INLINE NSString* NSURLRequestString(NSURL* url){
     NSData* data = NSURLRequestData(url);
-    
+
     // To string
     NSString* content = [[NSString alloc] initWithData:data
                                               encoding:NSUTF8StringEncoding];
@@ -312,7 +318,7 @@ NS_INLINE NSString* NSURLRequestString(NSURL* url){
 NS_INLINE NSDictionary* NSURLRequestJson(NSURL* url){
     NSData*   data = NSURLRequestData(url);
     NSError* error = nil;
-    
+
     // To dictionary
     NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:data
                                                                options:0
@@ -332,12 +338,12 @@ NS_INLINE NSString* NSURLEncodeWithString(NSString* str){
                                             NULL,
                                             CFSTR(";,/?:@&=+$#"),
                                             kCFStringEncodingUTF8);
-    
+
     NSString* nsString = [NSString stringWithString:(__bridge NSString*)encodedString];
     CFRelease(encodedString);
     return nsString;
-    
-    
+
+
 }
 
 /*
@@ -351,7 +357,7 @@ NSURLBuildParamWithDictionary(NSDictionary* params) {
     for (NSString* key in params ) {
         [buf appendFormat:@"%@=%@&", key, NSURLEncodeWithString(params[key])];
     }
-    
+
     // 末尾の不要な"&"を削除する。
     if ([buf length] > 0) {
         [buf deleteCharactersInRange:NSMakeRange(buf.length-1, 1)];
@@ -367,7 +373,7 @@ NSURLPostRequest(NSURL* url, NSDictionary* params, id<NSURLConnectionDelegate> d
     // パラメータデータのオブジェクト作成
     NSString* strParams = NSURLBuildParamWithDictionary(params);
     NSData*  dataParams = [strParams dataUsingEncoding:NSUTF8StringEncoding];
-    
+
     // リクエストオブジェクト作成
     NSMutableURLRequest *request =
     [[NSMutableURLRequest alloc] initWithURL:url
@@ -378,7 +384,7 @@ NSURLPostRequest(NSURL* url, NSDictionary* params, id<NSURLConnectionDelegate> d
     [request setValue:[NSString stringWithFormat:@"%d", dataParams.length] forHTTPHeaderField:@"Content-Length"];
     [request setHTTPBody:dataParams];
     [request setHTTPShouldHandleCookies:YES];
-    
+
     // POST 送信
     dmsg(@"Posting [%@] (%d bytes) to %@ ...", strParams, [dataParams length], url);
     NSURLConnection* conn = [[NSURLConnection alloc] initWithRequest:request delegate:delegate];
@@ -612,14 +618,14 @@ NS_INLINE UIToolbar* toolbarAddToHeader(UIView* parentView){
  */
 NS_INLINE UIToolbar* toolbarAddToHeaderWithDone(UIView* parentView, id target, SEL action){
     UIToolbar* toolbar = toolbarAddToHeader(parentView);
-    
+
     UIBarButtonItem* buttonItem =
     [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
                                                   target:target
                                                   action:action];
     NSArray* items = [NSArray arrayWithObjects:buttonItem, nil];
     [toolbar setItems:items animated:YES];
-    
+
     return toolbar;
 }
 
@@ -681,7 +687,7 @@ NS_INLINE void viewSetScale(UIView* view, CGFloat scale){
  * dumpSubView関数内部で呼ばれる内部関数
  */
 static NSString* _dumpSubview(UIView* view, int indent){
-    
+
     NSString* strIndent = @"";
     for (int i=0; i<indent; i++){
         if (i==indent-1) {
@@ -691,11 +697,11 @@ static NSString* _dumpSubview(UIView* view, int indent){
             strIndent = [strIndent stringByAppendingString:@"|   "];
         }
     }
-    
+
     NSString* str = [NSString stringWithFormat:@"%@%s\n",
                      strIndent,
                      class_getName([view class])];
-    
+
     for (UIView* subView in view.subviews){
         NSString* ret = _dumpSubview(subView, indent+1);
         str = [str stringByAppendingString:ret];
@@ -733,7 +739,7 @@ imageImmediateLoadWithContentsOfFile(NSString* path){
     UIImage *decompressedImage = [UIImage imageWithCGImage:decompressedImageRef];
     CGImageRelease(decompressedImageRef);
     CGContextRelease(bitmapContext);
-    
+
     return decompressedImage;
 }
 
@@ -761,19 +767,19 @@ buttonAddBasic(NSString* title, CGRect frame, UIView* parentView, id target, SEL
 NS_INLINE UIButton*
 buttonAddCustum(NSString* imageNameForNormal, NSString* imageNameForHighlighted,
                 CGRect frame, UIView* parentView, id target, SEL action){
-    
+
     UIButton* button = [UIButton buttonWithType:UIButtonTypeCustom];
     button.frame = frame;
-    
+
     [button setImage:[UIImage imageNamed:imageNameForNormal]
             forState:UIControlStateNormal];
     [button setImage:[UIImage imageNamed:imageNameForHighlighted]
             forState:UIControlStateHighlighted];
-    
+
     [button addTarget:target
                action:action
      forControlEvents:UIControlEventTouchUpInside];
-    
+
     [parentView addSubview:button];
     return button;
 }
@@ -791,7 +797,7 @@ static UITextField* textFieldAddBasic(CGRect frame, CGFloat fontSize, UIView* pa
     if (0 < fontSize){
         textField.font = [UIFont systemFontOfSize:fontSize];
     }
-    
+
     [parentView addSubview:textField];
     return textField;
 }
@@ -830,7 +836,7 @@ UILabelAddBasic(NSString* text, CGRect frame, CGFloat fontSize, UIView* parentVi
     if (0 < fontSize){
         label.font = [UIFont systemFontOfSize:fontSize];
     }
-    
+
     [parentView addSubview:label];
     return label;
 }
@@ -856,7 +862,7 @@ static UILabel* UILabelAddHeader(NSString* caption, UIView* parentView){
  */
 static UILabel* UILabelAddFooter(NSString* caption, UIView* parentView){
     const CGFloat height = 30.0f;
-    
+
     UILabel* header = [[UILabel alloc] init];
     header.text = caption;
     header.textColor = [UIColor whiteColor];
@@ -1043,7 +1049,7 @@ CGContextAddRoundRect(CGContextRef context, CGRect rect, CGFloat radius){
     float bottom= top  + rect.size.height;
     float left  = rect.origin.x;
     float right = left + rect.size.width;
-    
+
     CGContextMoveToPoint(context, left, top + (rect.size.height/2));
     CGContextAddArcToPoint(context,  left,    top, right,    top, radius);
     CGContextAddArcToPoint(context, right,    top, right, bottom, radius);
@@ -1060,38 +1066,38 @@ CGContextAddRoundRect(CGContextRef context, CGRect rect, CGFloat radius){
 NS_INLINE void
 CGContextAddRoundRectByRoundingCorners
 (CGContextRef context, CGRect rect, CGFloat radius, UIRectCorner corners){
-    
+
     float top   = rect.origin.y;
     float middle= top + (rect.size.height/2);
     float bottom= top  + rect.size.height;
-    
+
     float left  = rect.origin.x;
     float center= rect.origin.x + (rect.size.width/2);
     float right = left + rect.size.width;
-    
-    
+
+
     CGContextMoveToPoint(context, left, middle);
-    
+
     CGContextAddArcToPoint(context,
                            left,top, center,top,
                            (corners & UIRectCornerTopLeft)?
                            radius : 0.0f);
-    
+
     CGContextAddArcToPoint(context,
                            right,top, right,middle,
                            (corners & UIRectCornerTopRight)?
                            radius : 0.0f);
-    
+
     CGContextAddArcToPoint(context,
                            right,bottom, center,bottom,
                            (corners & UIRectCornerBottomRight)?
                            radius : 0.0f);
-    
+
     CGContextAddArcToPoint(context,
                            left,bottom, left,middle,
                            (corners & UIRectCornerBottomLeft)?
                            radius : 0.0f);
-    
+
     CGContextClosePath(context);
 }
 
@@ -1111,10 +1117,10 @@ CGContextFillRoundRect(CGContextRef context, CGRect rect, CGFloat radius){
 NS_INLINE void
 CGContextFillRectWithColor(CGContextRef context, CGRect rect, CGColorRef color){
     CGContextSaveGState(context);
-    
+
     CGContextSetFillColorWithColor(context, color);
     CGContextFillRect(context, rect);
-    
+
     CGContextRestoreGState(context);
 }
 
@@ -1133,14 +1139,14 @@ NS_INLINE void CGContextDrawLinearGradientWithTwoColor
         components[i]   = c1[i];
         components[i+4] = c2[i];
     }
-    
+
     size_t num_locations = 2;
     CGFloat locations[2] = { 0.0, 1.0 };
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGGradientRef gradient =
     CGGradientCreateWithColorComponents(colorSpace, components, locations, num_locations);
     CGContextDrawLinearGradient(context, gradient, point1, point2, 0);
-    
+
     CGColorSpaceRelease(colorSpace);
     CGGradientRelease(gradient);
 }
@@ -1202,14 +1208,14 @@ NS_INLINE void MPMusicPlayerControllerAddVolume(float addVolume){
  */
 NS_INLINE void
 MPMusicPlayerControllerRegisterVolumeDidChangeNotification(id observer, SEL selector){
-    
+
     // 通知センターへ登録
     NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
     [center addObserver:observer
                selector:selector
                    name:MPMusicPlayerControllerVolumeDidChangeNotification
                  object:nil];
-    
+
     // 通知発行を有効にする。
     MPMusicPlayerControllerGeneratingPlaybackNotifications(YES);
 }
@@ -1270,11 +1276,11 @@ UIImageCreateWithImageInRect(UIImage* sourceImage, CGRect inRect){
     UIImage*       image = nil;
     CGImageRef image_ref =
     CGImageCreateWithImageInRect(sourceImage.CGImage, inRect);
-    
+
     image = [UIImage imageWithCGImage:image_ref
                                 scale:1.0f
                           orientation:UIImageOrientationUp];
-    
+
     CGImageRelease(image_ref);
     return image;
 }
@@ -1382,7 +1388,7 @@ NS_INLINE NSString* UUIDGenerate(){
     CFUUIDRef   uuidRef = CFUUIDCreate(kCFAllocatorDefault);
     CFStringRef uuidStr = CFUUIDCreateString(kCFAllocatorDefault, uuidRef);
     CFRelease(uuidRef);
-    
+
     NSString* fileName = [NSString stringWithString:(__bridge NSString*)uuidStr];
     CFRelease(uuidStr);
     return fileName;
@@ -1398,13 +1404,13 @@ NS_INLINE CGRect rectToFit(CGSize size, CGSize contentSize){
     CGFloat wk = max_w / size.width;
     CGFloat hk = max_h / size.height;
     CGFloat k=(wk>hk)? hk:wk;
-    
+
     // リサイズ後のサイズ
     CGFloat new_w = size.width * k;
     CGFloat new_h = size.height* k;
     CGFloat left = (max_w - new_w) / 2;
     CGFloat top  = (max_h - new_h) / 2;
-    
+
     return CGRectMake(left, top, new_w, new_h);
 }
 
@@ -1419,7 +1425,7 @@ NS_INLINE void
 UIAlertViewShowConfirm(NSString* msg, id<UIAlertViewDelegate> delegate){
     NSString* lang = NSLocaleLanguage();
     BOOL     is_ja = [lang isEqualToString:@"ja"];
-    
+
     UIAlertView* alert =
     [[UIAlertView alloc] initWithTitle:@""
                                message:msg
@@ -1474,7 +1480,7 @@ NS_INLINE NSString* UIDeviceBatteryStateToString(UIDeviceBatteryState state){
     }
     return stateText;
 }
-    
+
 /*
  * バッテリレベルを取得します。
  * 関数内でbatteryMonitoringEnabledをYESに設定します。
@@ -1500,12 +1506,12 @@ UIDeviceBatteryRegisterStateAndLevelDidChangeNotification(id  observer,
                                                           SEL selector){
     UIDevice* device = [UIDevice currentDevice];
     device.batteryMonitoringEnabled = YES;
-    
+
     NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
     [center addObserver:observer
                selector:selector
                    name:UIDeviceBatteryLevelDidChangeNotification object:nil];
-    
+
     [center addObserver:observer
                selector:selector
                    name:UIDeviceBatteryStateDidChangeNotification object:nil];
