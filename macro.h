@@ -1244,6 +1244,15 @@ MPMusicPlayerControllerGeneratingPlaybackNotifications(BOOL bBegin){
 
 
 /*
+ * 簡単なエラーオブジェクトを作成する。
+ */
+NS_INLINE NSError* NSErrorMake(NSString* domain, NSInteger code, NSString* description){
+    NSDictionary* dict = @{NSLocalizedDescriptionKey : description};
+    NSError*       err = [NSError errorWithDomain:domain code:code userInfo:dict];
+    return err;
+}
+
+/*
  * CGFloat同士がイコールか比較を行う。
  * kVerySmallValue:  最小精度を指定する。
  * 例）0.01f -> 0.01fより差があれば同じとは判断しない。
