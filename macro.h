@@ -923,6 +923,32 @@ UIImageViewAddBasicFromPath(NSString* imagePath, UIView* parentView){
 }
 
 
+
+/*
+ * 長押しジェスチャーを追加する。
+ * press_duration: 長押しを検知するまでの時間
+ *
+ * ハンドラ実装例)
+ * -(void)buttonPressed:(UILongPressGestureRecognizer*)recognizer{
+ *     if (UIGestureRecognizerStateBegan == recognizer.state){
+ *         // 長押しを検知した時の処理
+ *     }
+ * }
+ */
+NS_INLINE UILongPressGestureRecognizer*
+UILongPressGestureRecognizerAddToView
+(UIView* view, id target, SEL action, CFTimeInterval press_duration)
+{
+    UILongPressGestureRecognizer *recognizer =
+    [[UILongPressGestureRecognizer alloc] initWithTarget:target
+                                                  action:action];
+    // 長押しの時間設定（default:0.5sec）
+    recognizer.minimumPressDuration = press_duration;
+    [view addGestureRecognizer:recognizer];
+    return recognizer;
+}
+
+
 /*------------------------------------------------------------------------------
  QuartzCore functions
  -----------------------------------------------------------------------------*/
