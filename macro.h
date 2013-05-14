@@ -82,6 +82,14 @@
  -----------------------------------------------------------------------------*/
 #pragma mark - Application functions
 
+/*
+ * ディスプレイスリープを抑止する。（YES:スリープさせない。）
+ */
+NS_INLINE void UIApplicationIdleDisable(BOOL bDisabled){
+    UIApplication* application = [UIApplication sharedApplication];
+    // ディスプレイスリープを抑止する。
+    application.idleTimerDisabled = bDisabled;
+}
 
 /*
  * AppDelegateのインスタンスを取得する。
