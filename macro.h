@@ -803,16 +803,7 @@ static UITextField* textFieldAddBasic(CGRect frame, CGFloat fontSize, UIView* pa
 }
 
 
-/*
- * ピンチジェスチャーを追加する。
- * - (void)viewPinched:(UIPinchGestureRecognizer*)recognizer
- */
-NS_INLINE UIPinchGestureRecognizer* pinchRecognizerAddToView(UIView* view, id target, SEL action){
-    UIPinchGestureRecognizer* recognizer = [[UIPinchGestureRecognizer alloc] init];
-    [recognizer addTarget:target action:action];
-    [view addGestureRecognizer:recognizer];
-    return recognizer;
-}
+
 
 
 #pragma mark UILabelView
@@ -922,6 +913,21 @@ UIImageViewAddBasicFromPath(NSString* imagePath, UIView* parentView){
     return UIImageViewAddToParent(image, parentView);
 }
 
+
+
+#pragma mark GestureRecognizer
+
+/*
+ * ピンチジェスチャーを追加する。
+ * - (void)viewPinched:(UIPinchGestureRecognizer*)recognizer
+ */
+NS_INLINE UIPinchGestureRecognizer*
+UIPinchGestureRecognizerAddToView(UIView* view, id target, SEL action){
+    UIPinchGestureRecognizer* recognizer = [[UIPinchGestureRecognizer alloc] init];
+    [recognizer addTarget:target action:action];
+    [view addGestureRecognizer:recognizer];
+    return recognizer;
+}
 
 
 /*
