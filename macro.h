@@ -488,6 +488,20 @@ NS_INLINE void NSTimerStop(NSTimer* timer){
  -----------------------------------------------------------------------------*/
 #pragma mark - View functions
 
+/*
+ * UITextViewを一番下までスクロールさせる。
+ */
+NS_INLINE void UITextViewScrollBottom(UITextView* view, BOOL animated){
+    // 一番下にスクロールする為のオフセット計算
+    float view_height    = view.bounds.size.height;
+    float content_height = view.contentSize.height;
+    float offset         = content_height - view_height;
+
+    // コンテンツよりビューの表示エリアの方がまだ大きいなら、オフセット位置はゼロとなる。
+    if (offset < 0.0f) offset = 0.0f;
+
+    [view setContentOffset:CGPointMake(0, offset) animated:animated];
+}
 
 
 /*
