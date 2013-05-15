@@ -1302,6 +1302,22 @@ MPMusicPlayerControllerGeneratingPlaybackNotifications(BOOL bBegin){
  -----------------------------------------------------------------------------*/
 #pragma mark - Other functions
 
+/*
+ * ディスプレイ輝度を設定する。(0.0f - 1.0f)
+ */
+NS_INLINE void UIScreenSetBrightness(CGFloat brightness){
+    UIScreen* screen = [UIScreen mainScreen];
+    screen.brightness = brightness;
+}
+
+/*
+ * ディスプレイ輝度を取得する。(0.0f - 1.0f)
+ */
+NS_INLINE CGFloat UIScreenGetBrightness(){
+    UIScreen* screen = [UIScreen mainScreen];
+    return screen.brightness;
+}
+
 
 /*
  * 簡単なエラーオブジェクトを作成する。
