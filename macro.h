@@ -1335,6 +1335,15 @@ MPMusicPlayerControllerGeneratingPlaybackNotifications(BOOL bBegin){
  -----------------------------------------------------------------------------*/
 #pragma mark - Other functions
 
+
+/*
+ * NSStringをC言語文字列に変換する。
+ * テキストエンコーディングはNSUTF8StringEncodingを使用。
+ */
+NS_INLINE const char* str2cstr(NSString* str){
+    return [str cStringUsingEncoding:NSUTF8StringEncoding];
+}
+
 /*
  * ディスプレイ輝度を設定する。(0.0f - 1.0f)
  */
