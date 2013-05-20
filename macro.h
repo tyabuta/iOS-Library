@@ -294,7 +294,7 @@ static NSArray* getFilePathsFromResource(NSString* dir){
  * PATHをスラッシュでつなげる。
  */
 NS_INLINE NSString* joinPath(NSString* dir, NSString* file){
-    return [NSString stringWithFormat:@"%@/%@", dir, file];
+    return [dir stringByAppendingPathComponent:file];
 }
 
 /*
