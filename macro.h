@@ -260,6 +260,19 @@ NS_INLINE NSString* NSDocumentDirectoryMakePath(NSString* filename){
     return path;
 }
 
+/*
+ * NSLog関数の出力先(標準エラー出力)をファイルへリダイレクトする。
+ * この関数を使うと、コンソールへの出力はされなくなり、
+ * 代わりにドキュメントファイルへ保存されるようになります。
+ */
+NS_INLINE void NSLogRedirectToDocumentFile(NSString* filename){
+    // ドキュメントファイルのPATH作成
+    NSString* path = NSDocumentDirectoryMakePath(filename);
+    // 標準エラー出力をファイルへリダイレクト
+    freopen([path cStringUsingEncoding:NSUTF8StringEncoding], "a+", stderr);
+}
+
+/*
  * モジュールディレクトリから指定ディレクトリのファイル一覧のPATH配列を取得する。
  */
 static NSArray* getFilePathsFromResource(NSString* dir){
