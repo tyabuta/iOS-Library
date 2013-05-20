@@ -240,6 +240,26 @@ NS_INLINE float NSUserDefaultsGetFloat(NSString* key){
 
 
 /*
+ * ドキュメントディレクトリのPATHを取得する。
+ */
+NS_INLINE NSString* NSDocumentDirectoryPath(){
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
+                                                         NSUserDomainMask,
+                                                         YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    return documentsDirectory;
+}
+
+/*
+ * ドキュメントディレクトリに配置するファイルPATHを作成します。
+ * PATHを作成するだけで、ファイル自体は作成しません。
+ */
+NS_INLINE NSString* NSDocumentDirectoryMakePath(NSString* filename){
+    NSString* documentDirectory = NSDocumentDirectoryPath();
+    NSString* path = [documentDirectory stringByAppendingPathComponent:filename];
+    return path;
+}
+
  * モジュールディレクトリから指定ディレクトリのファイル一覧のPATH配列を取得する。
  */
 static NSArray* getFilePathsFromResource(NSString* dir){
