@@ -132,6 +132,22 @@ AVCaptureSessionSetPresets(AVCaptureSession* captureSession, NSArray* presets){
 }
 
 
+/*
+ * AVCaptureVideoPreviewLayerを作成し、レイヤーへ追加する。
+ */
+NS_INLINE AVCaptureVideoPreviewLayer*
+AVCaptureVideoPreviewLayerAddToLayer
+(AVCaptureSession* captureSession, CALayer* layer, CGRect frame){
+
+    AVCaptureVideoPreviewLayer* preview =
+    [[AVCaptureVideoPreviewLayer alloc]initWithSession:captureSession];
+    preview.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    preview.frame        = frame;
+
+    [layer addSublayer:preview];
+    return preview;
+}
+
 
 
 #endif // TYABUTA_IOS_AVFOUNDATION_H
