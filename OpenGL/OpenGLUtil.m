@@ -145,6 +145,16 @@ void GLDrawTexture(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
     glDisable(GL_TEXTURE_2D);
 }
 
+void GLDrawTextureWithColor(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
+                   GLuint texture,
+                   GLfloat u, GLfloat v, GLfloat u_width, GLfloat v_height,
+                   GLubyte r,GLubyte g, GLubyte b, GLubyte a){
+
+    glColor4ub(r, g, b, a);
+    GLDrawTexture(x, y, w, h, texture, u, v, u_width, v_height);
+    glColor4ub(0xFF, 0xFF, 0xFF, 0xFF);
+}
+
 
 
 

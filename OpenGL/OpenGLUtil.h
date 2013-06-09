@@ -43,5 +43,13 @@ void GLDrawTexture(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
                    GLuint texture,
                    GLfloat u, GLfloat v, GLfloat u_width, GLfloat v_height);
 
+/*
+ * テクスチャの描画(色付き)
+ */
+void GLDrawTextureWithColor(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
+                            GLuint texture,
+                            GLfloat u, GLfloat v, GLfloat u_width, GLfloat v_height,
+                            GLubyte r,GLubyte g, GLubyte b, GLubyte a);
+
 
 #endif // TYABUTA_OPENGL_UTIL_H
