@@ -1,9 +1,9 @@
 /*******************************************************************************
-  macro.h 1.6.3.17
+  macro.h 1.6.4.18
 
                               マクロ関数用のヘッダ
 
-                                                             (c) 2013 tyabuta.
+                                                      (c) 2013 - 2014 tyabuta.
 *******************************************************************************/
 
 #ifndef TYABUTA_IOS_MACRO_H
@@ -275,7 +275,7 @@ NS_INLINE void NSLogRedirectToDocumentFile(NSString* filename){
 /*
  * モジュールディレクトリから指定ディレクトリのファイル一覧のPATH配列を取得する。
  */
-static NSArray* getFilePathsFromResource(NSString* dir){
+NS_INLINE NSArray* getFilePathsFromResource(NSString* dir){
     NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
     NSString* rootDir      = [NSString stringWithFormat:@"%@/%@", resourcePath, dir];
 
@@ -422,12 +422,12 @@ NSURLPostRequest(NSURL* url, NSDictionary* params, id<NSURLConnectionDelegate> d
                              timeoutInterval:20];
     [request setHTTPMethod:@"POST"];
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-    [request setValue:[NSString stringWithFormat:@"%d", dataParams.length] forHTTPHeaderField:@"Content-Length"];
+    [request setValue:[NSString stringWithFormat:@"%lu", dataParams.length] forHTTPHeaderField:@"Content-Length"];
     [request setHTTPBody:dataParams];
     [request setHTTPShouldHandleCookies:YES];
 
     // POST 送信
-    dmsg(@"Posting [%@] (%d bytes) to %@ ...", strParams, [dataParams length], url);
+    dmsg(@"Posting [%@] (%lu bytes) to %@ ...", strParams, [dataParams length], url);
     NSURLConnection* conn = [[NSURLConnection alloc] initWithRequest:request delegate:delegate];
     if (nil == conn) {
         dmsg(@"NSURLConnection failed: in %s", __FUNCTION__);
@@ -441,7 +441,7 @@ NSURLPostRequest(NSURL* url, NSDictionary* params, id<NSURLConnectionDelegate> d
  */
 NS_INLINE void NSHTTPResponseDump(NSHTTPURLResponse* response){
     NSMutableString* buf = [NSMutableString string];
-    [buf appendFormat:@"Received Response. Status Code: %d\n", response.statusCode];
+    [buf appendFormat:@"Received Response. Status Code: %ld\n", response.statusCode];
     [buf appendFormat:@"Expected ContentLength: %qi\n", response.expectedContentLength];
     [buf appendFormat:@"MIMEType: %@\n", response.MIMEType];
     [buf appendFormat:@"Suggested File Name: %@\n", response.suggestedFilename];
@@ -845,7 +845,7 @@ buttonAddCustum(NSString* imageNameForNormal, NSString* imageNameForHighlighted,
  * センター文字に設定。
  * fontSize 設定不要な場合は-1を渡す。
  */
-static UITextField* textFieldAddBasic(CGRect frame, CGFloat fontSize, UIView* parentView){
+NS_INLINE UITextField* textFieldAddBasic(CGRect frame, CGFloat fontSize, UIView* parentView){
     UITextField* textField = [[UITextField alloc] initWithFrame:frame];
     textField.borderStyle   = UITextBorderStyleRoundedRect;
     textField.textAlignment = NSTextAlignmentCenter;
@@ -891,7 +891,7 @@ UILabelAddBasic(NSString* text, CGRect frame, CGFloat fontSize, UIView* parentVi
 /*
  * ヘッダー用のラベルを追加する。
  */
-static UILabel* UILabelAddHeader(NSString* caption, UIView* parentView){
+NS_INLINE UILabel* UILabelAddHeader(NSString* caption, UIView* parentView){
     UILabel* header = [[UILabel alloc] init];
     header.text = caption;
     header.textColor = [UIColor whiteColor];
@@ -906,7 +906,7 @@ static UILabel* UILabelAddHeader(NSString* caption, UIView* parentView){
 /*
  * ヘッダ用のラベルを追加する。
  */
-static UILabel* UILabelAddFooter(NSString* caption, UIView* parentView){
+NS_INLINE UILabel* UILabelAddFooter(NSString* caption, UIView* parentView){
     const CGFloat height = 30.0f;
 
     UILabel* header = [[UILabel alloc] init];
@@ -1219,8 +1219,8 @@ NS_INLINE void CGContextDrawLinearGradientWithTwoColor
  CGColorRef color1, CGColorRef color2,
  CGPoint    point1, CGPoint    point2)
 {
-    const float* c1 = CGColorGetComponents(color1);
-    const float* c2 = CGColorGetComponents(color2);
+    const double* c1 = CGColorGetComponents(color1);
+    const double* c2 = CGColorGetComponents(color2);
     CGFloat components[8];
     for (int i=0; i<4; i++){
         components[i]   = c1[i];
@@ -1481,7 +1481,7 @@ NS_INLINE UIColor* UIColorClearWhite(){
  * 数値文字列を整数値に変換する。
  */
 NS_INLINE int strToInt(NSString* str){
-    return [str integerValue];
+    return (int)[str integerValue];
 }
 
 /*
