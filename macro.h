@@ -422,12 +422,12 @@ NSURLPostRequest(NSURL* url, NSDictionary* params, id<NSURLConnectionDelegate> d
                              timeoutInterval:20];
     [request setHTTPMethod:@"POST"];
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-    [request setValue:[NSString stringWithFormat:@"%lu", dataParams.length] forHTTPHeaderField:@"Content-Length"];
+    [request setValue:[NSString stringWithFormat:@"%lu", (unsigned long)dataParams.length] forHTTPHeaderField:@"Content-Length"];
     [request setHTTPBody:dataParams];
     [request setHTTPShouldHandleCookies:YES];
 
     // POST 送信
-    dmsg(@"Posting [%@] (%lu bytes) to %@ ...", strParams, [dataParams length], url);
+    dmsg(@"Posting [%@] (%lu bytes) to %@ ...", strParams, (unsigned long)[dataParams length], url);
     NSURLConnection* conn = [[NSURLConnection alloc] initWithRequest:request delegate:delegate];
     if (nil == conn) {
         dmsg(@"NSURLConnection failed: in %s", __FUNCTION__);
@@ -441,7 +441,7 @@ NSURLPostRequest(NSURL* url, NSDictionary* params, id<NSURLConnectionDelegate> d
  */
 NS_INLINE void NSHTTPResponseDump(NSHTTPURLResponse* response){
     NSMutableString* buf = [NSMutableString string];
-    [buf appendFormat:@"Received Response. Status Code: %ld\n", response.statusCode];
+    [buf appendFormat:@"Received Response. Status Code: %ld\n", (long)response.statusCode];
     [buf appendFormat:@"Expected ContentLength: %qi\n", response.expectedContentLength];
     [buf appendFormat:@"MIMEType: %@\n", response.MIMEType];
     [buf appendFormat:@"Suggested File Name: %@\n", response.suggestedFilename];
@@ -1219,8 +1219,8 @@ NS_INLINE void CGContextDrawLinearGradientWithTwoColor
  CGColorRef color1, CGColorRef color2,
  CGPoint    point1, CGPoint    point2)
 {
-    const double* c1 = CGColorGetComponents(color1);
-    const double* c2 = CGColorGetComponents(color2);
+    const CGFloat* c1 = CGColorGetComponents(color1);
+    const CGFloat* c2 = CGColorGetComponents(color2);
     CGFloat components[8];
     for (int i=0; i<4; i++){
         components[i]   = c1[i];
